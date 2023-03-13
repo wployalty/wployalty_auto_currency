@@ -4,21 +4,18 @@
  * @license     http://www.gnu.org/licenses/gpl-2.0.html
  * @link        https://www.wployalty.net
  * */
+
 namespace Wlac\App\Controllers;
+
 use Wlr\App\Helpers\Input;
 use Wlr\App\Helpers\Template;
 use Wlr\App\Helpers\Woocommerce;
 
 defined('ABSPATH') or die;
-class Base {
-    public static $input, $woocommerce, $template, $rule;
 
-    function __construct()
-    {
-        self::$input = empty(self::$input) ? new Input() : self::$input;
-        self::$woocommerce = empty(self::$woocommerce) ? Woocommerce::getInstance() : self::$woocommerce;
-        self::$template = empty(self::$template) ? new Template() : self::$template;
-    }
+class Base
+{
+    public static $input, $woocommerce, $template, $rule;
 
     function isBasicSecurityValid($nonce_name = '')
     {

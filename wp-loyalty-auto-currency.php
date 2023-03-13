@@ -27,6 +27,17 @@ if (!function_exists('isWployaltyActiveOrNot')) {
         return in_array('wp-loyalty-rules/wp-loyalty-rules.php', $active_plugins, false) || in_array('wp-loyalty-rules-lite/wp-loyalty-rules-lite.php', $active_plugins, false);
     }
 }
-if(!isWployaltyActiveOrNot()){
+if (!isWployaltyActiveOrNot()) {
     return;
+}
+
+if (!class_exists('\Wlac\App\Router')) {
+    if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
+        return;
+    }
+    require __DIR__ . '/vendor/autoload.php';
+}
+if (class_exists('\Wlac\App\Router')) {
+    $router = new \Wlac\App\Router();
+    $router->init();
 }
