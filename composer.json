@@ -1,0 +1,18 @@
+{
+  "name": "wployalty/wployalty-auto-currency",
+  "description": "Loyalty auto currency",
+  "type": "project",
+  "license": "GPL2 or Later",
+  "authors": [
+    {
+      "name": "Alagesan S",
+      "email": "alagesan@flycart.org"
+    }
+  ],
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "Wlac\\": ""
+    }
+  }
+}
