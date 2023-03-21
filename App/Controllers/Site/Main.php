@@ -41,16 +41,22 @@ class Main extends Base
 
     function getDefaultProductPrice($productPrice, $product, $item, $is_redeem, $orderCurrency)
     {
-        if ($this->isEnabledVilaThemeCurrency()) {
-            return $productPrice;
+        if ($this->isEnableRealMagCurrency()) {
+            return apply_filters('woocs_convert_price', $productPrice, false);
         }
+        /*if ($this->isEnabledVilaThemeCurrency()) {
+            return $productPrice;
+        }*/
         return $productPrice;
     }
 
-    function isEnabledVilaThemeCurrency()
+    /**
+     * @return bool
+     */
+    function isEnableRealMagCurrency()
     {
-        //Ref: https://wordpress.org/plugins/woo-multi-currency/
-        return $this->isPluginIsActive('woo-multi-currency/woo-multi-currency.php');
+        // Ref: https://wordpress.org/plugins/woocommerce-currency-switcher/
+        return $this->isPluginIsActive('woocommerce-currency-switcher/index.php');
     }
 
     protected function isPluginIsActive($plugin = '')
@@ -79,6 +85,13 @@ class Main extends Base
 
     function getProductPrice($productPrice, $item, $is_redeem, $orderCurrency)
     {
+        if ($this->isEnableRealMagCurrency()) {
+            global $WOOCS;
+            if ($WOOCS->default_currency != $orderCurrency) {
+                $productPrice = $this->convertToDefaultCurrency($productPrice, $orderCurrency);
+            }
+            return $productPrice;
+        }
         if ($this->isEnabledVilaThemeCurrency()) {
             if (class_exists('\WOOMULTI_CURRENCY_F_Data') && !empty($orderCurrency)) {
                 $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
@@ -94,6 +107,18 @@ class Main extends Base
 
     function convertToDefaultCurrency($amount, $current_currency_code)
     {
+        if ($this->isEnableRealMagCurrency()) {
+            global $WOOCS;
+            if ($WOOCS->default_currency != $current_currency_code) {
+                $currencies = $WOOCS->get_currencies();
+                $rate = isset($currencies[$current_currency_code]['rate']) && !empty($currencies[$current_currency_code]['rate']) ? $currencies[$current_currency_code]['rate'] : 0;
+                $decimal = isset($currencies[$current_currency_code]['decimals']) && !empty($currencies[$current_currency_code]['decimals']) ? $currencies[$current_currency_code]['decimals'] : 2;
+                if ($rate > 0) {
+                    $amount = $WOOCS->back_convert($amount, $rate, $decimal);
+                }
+            }
+            return $amount;
+        }
         if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
             $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
             $default_currency = $setting->get_default_currency();
@@ -105,8 +130,18 @@ class Main extends Base
         return $amount;
     }
 
+    function isEnabledVilaThemeCurrency()
+    {
+        //Ref: https://wordpress.org/plugins/woo-multi-currency/
+        return $this->isPluginIsActive('woo-multi-currency/woo-multi-currency.php');
+    }
+
     function getCurrentCurrencyCode($code)
     {
+        if ($this->isEnableRealMagCurrency()) {
+            global $WOOCS;
+            return isset($WOOCS->current_currency) ? $WOOCS->current_currency : $code;
+        }
         if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
             $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
             return $setting->get_current_currency();
