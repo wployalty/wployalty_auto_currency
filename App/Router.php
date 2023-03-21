@@ -22,6 +22,9 @@ class Router
         add_filter('wlr_core_multicurrency_allowed', function ($status) {
             return false;
         });
+        if (is_admin()) {
+            add_action('admin_menu', array(self::$site, 'addMenu'));
+        }
         add_filter('wlr_default_product_price', array(self::$site, 'getDefaultProductPrice'), 10, 5);
         add_filter('wlr_product_price', array(self::$site, 'getProductPrice'), 10, 4);
         add_filter('wlr_current_currency', array(self::$site, 'getCurrentCurrencyCode'));

@@ -7,13 +7,37 @@
 
 namespace Wlac\App\Controllers\Site;
 
-use Wlac\App\Controllers\Base;
-
 defined('ABSPATH') or die;
+
+use Wlac\App\Controllers\Base;
+use Wlr\App\Helpers\Template;
+use Wlr\App\Helpers\Woocommerce;
 
 class Main extends Base
 {
     public static $active_plugin_list = array();
+
+    function addMenu()
+    {
+        if (Woocommerce::hasAdminPrivilege()) {
+            add_menu_page(__('WPLoyalty: Auto Currency Change', 'wp-loyalty-auto-currency'), __('WPLoyalty: Auto Currency Change', 'wp-loyalty-auto-currency'), 'manage_woocommerce', WLAC_PLUGIN_SLUG, array($this, 'manageLoyaltyPages'), 'dashicons-megaphone', 57);
+        }
+    }
+
+    function manageLoyaltyPages()
+    {
+        if (!Woocommerce::hasAdminPrivilege()) {
+            wp_die(__("Don't have access permission", 'wp-loyalty-auto-currency'));
+        }
+        //it will automatically add new table column,via auto generate alter query
+        if (!isset($_GET['page']) || ($_GET['page'] != WLAC_PLUGIN_SLUG)) {
+            wp_die(__('Page query params missing...', 'wp-loyalty-auto-currency'));
+        }
+        $template = new Template();
+        $path = WLAC_PLUGIN_PATH . 'App/Views/main.php';
+        $main_page_params = array();
+        $template->setData($path, $main_page_params)->display();
+    }
 
     function getDefaultProductPrice($productPrice, $product, $item, $is_redeem, $orderCurrency)
     {
@@ -56,18 +80,16 @@ class Main extends Base
     function getProductPrice($productPrice, $item, $is_redeem, $orderCurrency)
     {
         if ($this->isEnabledVilaThemeCurrency()) {
+            if (class_exists('\WOOMULTI_CURRENCY_F_Data') && !empty($orderCurrency)) {
+                $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+                $default_currency = $setting->get_default_currency();
+                if ($orderCurrency != $default_currency) {
+                    $productPrice = $this->convertToDefaultCurrency($productPrice, $orderCurrency);
+                }
+            }
             return $productPrice;
         }
         return $productPrice;
-    }
-
-    function getCurrentCurrencyCode($code)
-    {
-        if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
-            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
-            return $setting->get_current_currency();
-        }
-        return $code;
     }
 
     function convertToDefaultCurrency($amount, $current_currency_code)
@@ -81,5 +103,14 @@ class Main extends Base
             return $amount;
         }
         return $amount;
+    }
+
+    function getCurrentCurrencyCode($code)
+    {
+        if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
+            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+            return $setting->get_current_currency();
+        }
+        return $code;
     }
 }

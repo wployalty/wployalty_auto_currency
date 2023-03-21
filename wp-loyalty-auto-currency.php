@@ -15,6 +15,8 @@
  * Author URI: https://wployalty.net/
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ * WPLoyalty: 1.2.1
+ * WPLoyalty Page Link: wp-loyalty-auto-currency
  */
 defined('ABSPATH') or die;
 if (!function_exists('isWployaltyActiveOrNot')) {
@@ -30,7 +32,9 @@ if (!function_exists('isWployaltyActiveOrNot')) {
 if (!isWployaltyActiveOrNot()) {
     return;
 }
-
+//Define the plugin version
+defined('WLAC_PLUGIN_SLUG') or define('WLAC_PLUGIN_SLUG', 'wp-loyalty-auto-currency');
+defined('WLAC_PLUGIN_PATH') or define('WLAC_PLUGIN_PATH', __DIR__ . '/');
 if (!class_exists('\Wlac\App\Router')) {
     if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
         return;
