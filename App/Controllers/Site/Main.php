@@ -172,10 +172,24 @@ class Main extends Base
         return $sub_total;
     }
 
-    function handleLifeTimeSaleOrderTotal($total, $order)
+    function handleConditionOrderTotal($total, $order)
     {
         $woocommerce_helper = Woocommerce::getInstance();
-        $order = $woocommerce_helper->getOrder($order->ID);
+        $order_currency = $woocommerce_helper->isMethodExists($order, 'get_currency') ? $order->get_currency() : '';
+        if ($this->isEnabledVilaThemeCurrency() && !empty($order_currency) && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
+            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+            $default_currency = $setting->get_default_currency();
+            if ($order_currency != $default_currency) {
+                $total = $this->convertToDefaultCurrency($total, $order_currency);
+            }
+            return $total;
+        }
+        return $total;
+    }
+
+    function handleWoocommerceHelperOrderTotal($total, $order)
+    {
+        $woocommerce_helper = Woocommerce::getInstance();
         $order_currency = $woocommerce_helper->isMethodExists($order, 'get_currency') ? $order->get_currency() : '';
         if ($this->isEnabledVilaThemeCurrency() && !empty($order_currency) && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
             $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();

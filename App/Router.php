@@ -27,13 +27,18 @@ class Router
         }
         add_filter('wlr_default_product_price', array(self::$site, 'getDefaultProductPrice'), 10, 5);
         add_filter('wlr_product_price', array(self::$site, 'getProductPrice'), 10, 4);
-        add_filter('wlr_current_currency', array(self::$site, 'getCurrentCurrencyCode'));
         add_filter('wlr_convert_to_default_currency', array(self::$site, 'convertToDefaultCurrency'), 10, 2);
+        /*Woocommerce Helper Functions*/
+        add_filter('wlr_current_currency', array(self::$site, 'getCurrentCurrencyCode'));
+        //Purchase Last order amount
+        add_filter('wlr_get_order_total', array(self::$site, 'handleWoocommerceHelperOrderTotal'), 10, 2);
         /* Conditions*/
         /*Subtotal Conditions*/
         add_filter('wlr_get_cart_subtotal', array(self::$site, 'getCartSubtotal'), 10, 2);
         add_filter('wlr_get_order_subtotal', array(self::$site, 'getOrderSubtotal'), 10, 2);
         /*Life time sale value*/
-        add_filter('wlr_life_time_sale_value_order_total', array(self::$site, 'handleLifeTimeSaleOrderTotal'), 10, 2);
+        add_filter('wlr_life_time_sale_value_order_total', array(self::$site, 'handleConditionOrderTotal'), 10, 2);
+        add_filter('wlr_purchase_spent_order_total', array(self::$site, 'handleConditionOrderTotal'), 10, 2);
+
     }
 }
