@@ -29,5 +29,8 @@ class Router
         add_filter('wlr_product_price', array(self::$site, 'getProductPrice'), 10, 4);
         add_filter('wlr_current_currency', array(self::$site, 'getCurrentCurrencyCode'));
         add_filter('wlr_convert_to_default_currency', array(self::$site, 'convertToDefaultCurrency'), 10, 2);
+        /* Conditions*/
+        add_filter('wlr_get_cart_subtotal', array(self::$site, 'getCartSubtotal'), 10, 2);
+        add_filter('wlr_get_order_subtotal', array(self::$site, 'getOrderSubtotal'), 10, 2);
     }
 }

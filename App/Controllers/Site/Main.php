@@ -148,4 +148,27 @@ class Main extends Base
         }
         return $code;
     }
+
+    function getCartSubtotal($sub_total, $cart_data)
+    {
+        if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
+            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+            $current_currency = $setting->get_current_currency();
+            return $this->convertToDefaultCurrency($sub_total, $current_currency);
+        }
+        return $sub_total;
+    }
+
+    function getOrderSubtotal($sub_total, $order_data)
+    {
+        $woocommerce_helper = Woocommerce::getInstance();
+        $order = $woocommerce_helper->getOrder($order_data);
+        $order_currency = $woocommerce_helper->isMethodExists($order, 'get_currency') ? $order->get_currency() : '';
+        if ($this->isEnabledVilaThemeCurrency() && !empty($order_currency) && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
+            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+            $current_currency = $setting->get_current_currency();
+            return $this->convertToDefaultCurrency($sub_total, $current_currency);
+        }
+        return $sub_total;
+    }
 }
