@@ -117,7 +117,7 @@ class Main extends Base
                     $amount = $WOOCS->back_convert($amount, $rate, $decimal);
                 }
             }
-            return $amount;
+            return (float)$amount;
         }
         if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
             $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
@@ -125,7 +125,7 @@ class Main extends Base
             if ($default_currency != $current_currency_code) {
                 $amount = wmc_revert_price($amount, $current_currency_code);
             }
-            return $amount;
+            return (float)$amount;
         }
         return $amount;
     }
