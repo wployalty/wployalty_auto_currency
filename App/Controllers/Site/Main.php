@@ -85,6 +85,9 @@ class Main extends Base
 
     function getProductPrice($productPrice, $item, $is_redeem, $orderCurrency)
     {
+        if (empty($orderCurrency)) {
+            $orderCurrency = $this->getCurrentCurrencyCode($orderCurrency);
+        }
         if ($this->isEnableRealMagCurrency()) {
             global $WOOCS;
             if ($WOOCS->default_currency != $orderCurrency) {
@@ -103,6 +106,25 @@ class Main extends Base
             return $productPrice;
         }
         return $productPrice;
+    }
+
+    function getCurrentCurrencyCode($code)
+    {
+        if ($this->isEnableRealMagCurrency()) {
+            global $WOOCS;
+            return isset($WOOCS->current_currency) ? $WOOCS->current_currency : $code;
+        }
+        if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
+            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+            return $setting->get_current_currency();
+        }
+        return $code;
+    }
+
+    function isEnabledVilaThemeCurrency()
+    {
+        //Ref: https://wordpress.org/plugins/woo-multi-currency/
+        return $this->isPluginIsActive('woo-multi-currency/woo-multi-currency.php');
     }
 
     function convertToDefaultCurrency($amount, $current_currency_code)
@@ -128,25 +150,6 @@ class Main extends Base
             return (float)$amount;
         }
         return $amount;
-    }
-
-    function isEnabledVilaThemeCurrency()
-    {
-        //Ref: https://wordpress.org/plugins/woo-multi-currency/
-        return $this->isPluginIsActive('woo-multi-currency/woo-multi-currency.php');
-    }
-
-    function getCurrentCurrencyCode($code)
-    {
-        if ($this->isEnableRealMagCurrency()) {
-            global $WOOCS;
-            return isset($WOOCS->current_currency) ? $WOOCS->current_currency : $code;
-        }
-        if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
-            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
-            return $setting->get_current_currency();
-        }
-        return $code;
     }
 
     function getCartSubtotal($sub_total, $cart_data)
