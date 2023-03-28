@@ -41,10 +41,10 @@ class Main extends Base
 
     function getDefaultProductPrice($productPrice, $product, $item, $is_redeem, $orderCurrency)
     {
-        if ($this->isEnableRealMagCurrency()) {
-            return apply_filters('woocs_convert_price', $productPrice, false);
+        /*if ($this->isEnableRealMagCurrency()) {
+            return $productPrice;
         }
-        /*if ($this->isEnabledVilaThemeCurrency()) {
+        if ($this->isEnabledVilaThemeCurrency()) {
             return $productPrice;
         }*/
         if ($this->isEnabledWPMLCurrency()) {
@@ -53,16 +53,17 @@ class Main extends Base
             $current_code = $multi_currency->get_client_currency();
             return $this->convertToDefaultCurrency($productPrice, $current_code);
         }
+        if ($this->isEnabledAeliaoCurrency()) {
+            $current_code = isset($GLOBALS['woocommerce-aelia-currencyswitcher']) ? $GLOBALS['woocommerce-aelia-currencyswitcher']->get_selected_currency() : '';
+            if (!empty($current_code)) return $this->convertToDefaultCurrency($productPrice, $current_code);
+        }
         return $productPrice;
     }
 
-    /**
-     * @return bool
-     */
-    function isEnableRealMagCurrency()
+    function isEnabledWPMLCurrency()
     {
-        // Ref: https://wordpress.org/plugins/woocommerce-currency-switcher/
-        return $this->isPluginIsActive('woocommerce-currency-switcher/index.php');
+        //ref: https://wordpress.org/plugins/woocommerce-multilingual/
+        return $this->isPluginIsActive('woocommerce-multilingual/wpml-woocommerce.php');
     }
 
     protected function isPluginIsActive($plugin = '')
@@ -89,43 +90,61 @@ class Main extends Base
         return self::$active_plugin_list;
     }
 
-    function isEnabledWPMLCurrency()
-    {
-        //ref: https://wordpress.org/plugins/woocommerce-multilingual/
-        return $this->isPluginIsActive('woocommerce-multilingual/wpml-woocommerce.php');
-    }
-
     function convertToDefaultCurrency($amount, $current_currency_code)
     {
+        $default_currency = $this->getDefaultCurrency();
+        if (!empty($default_currency) && $default_currency == $current_currency_code) {
+            return $amount;
+        }
         if ($this->isEnableRealMagCurrency()) {
             global $WOOCS;
-            if ($WOOCS->default_currency != $current_currency_code) {
-                $currencies = $WOOCS->get_currencies();
-                $rate = isset($currencies[$current_currency_code]['rate']) && !empty($currencies[$current_currency_code]['rate']) ? $currencies[$current_currency_code]['rate'] : 0;
-                $decimal = isset($currencies[$current_currency_code]['decimals']) && !empty($currencies[$current_currency_code]['decimals']) ? $currencies[$current_currency_code]['decimals'] : 2;
-                if ($rate > 0) {
-                    $amount = $WOOCS->back_convert($amount, $rate, $decimal);
-                }
+            $currencies = $WOOCS->get_currencies();
+            $rate = isset($currencies[$current_currency_code]['rate']) && !empty($currencies[$current_currency_code]['rate']) ? $currencies[$current_currency_code]['rate'] : 0;
+            $decimal = isset($currencies[$current_currency_code]['decimals']) && !empty($currencies[$current_currency_code]['decimals']) ? $currencies[$current_currency_code]['decimals'] : 2;
+            if ($rate > 0) {
+                $amount = $WOOCS->back_convert($amount, $rate, $decimal);
             }
             return (float)$amount;
         }
         if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
-            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
-            $default_currency = $setting->get_default_currency();
-            if ($default_currency != $current_currency_code) {
-                $amount = wmc_revert_price($amount, $current_currency_code);
-            }
-            return (float)$amount;
+            return (float)wmc_revert_price($amount, $current_currency_code);
         }
         if ($this->isEnabledWPMLCurrency()) {
             global $woocommerce_wpml;
-            $default_currency = wcml_get_woocommerce_currency_option();
-            if ($default_currency != $current_currency_code) {
-                $amount = $woocommerce_wpml->multi_currency->prices->unconvert_price_amount($amount, $current_currency_code);
-            }
-            return (float)$amount;
+            return (float)$woocommerce_wpml->multi_currency->prices->unconvert_price_amount($amount, $current_currency_code);
+        }
+        if ($this->isEnabledAeliaoCurrency()) {
+            return (float)$GLOBALS['woocommerce-aelia-currencyswitcher']->convert($amount, $current_currency_code, $default_currency, $price_decimals = null, $include_markup = true);
         }
         return $amount;
+    }
+
+    protected function getDefaultCurrency($code = '')
+    {
+        if ($this->isEnableRealMagCurrency()) {
+            global $WOOCS;
+            return $WOOCS->default_currency;
+        }
+        if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
+            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+            return $setting->get_default_currency();
+        }
+        if ($this->isEnabledWPMLCurrency()) {
+            return wcml_get_woocommerce_currency_option();
+        }
+        if ($this->isEnabledAeliaoCurrency()) {
+            return $GLOBALS['woocommerce-aelia-currencyswitcher']->base_currency();
+        }
+        return $code;
+    }
+
+    /**
+     * @return bool
+     */
+    function isEnableRealMagCurrency()
+    {
+        // Ref: https://wordpress.org/plugins/woocommerce-currency-switcher/
+        return $this->isPluginIsActive('woocommerce-currency-switcher/index.php');
     }
 
     function isEnabledVilaThemeCurrency()
@@ -134,38 +153,27 @@ class Main extends Base
         return $this->isPluginIsActive('woo-multi-currency/woo-multi-currency.php');
     }
 
+    function isEnabledAeliaoCurrency()
+    {
+        return $this->isPluginIsActive('woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php');
+    }
+
     function getProductPrice($productPrice, $item, $is_redeem, $orderCurrency)
     {
         if (empty($orderCurrency)) {
             $orderCurrency = $this->getCurrentCurrencyCode($orderCurrency);
         }
-        if ($this->isEnableRealMagCurrency()) {
-            global $WOOCS;
-            if ($WOOCS->default_currency != $orderCurrency) {
-                $productPrice = $this->convertToDefaultCurrency($productPrice, $orderCurrency);
-            }
+        $default_currency = $this->getDefaultCurrency();
+        if ($orderCurrency == $default_currency) {
             return $productPrice;
         }
-        if ($this->isEnabledVilaThemeCurrency()) {
-            if (class_exists('\WOOMULTI_CURRENCY_F_Data') && !empty($orderCurrency)) {
-                $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
-                $default_currency = $setting->get_default_currency();
-                if ($orderCurrency != $default_currency) {
-                    $productPrice = $this->convertToDefaultCurrency($productPrice, $orderCurrency);
-                }
-            }
-            return $productPrice;
-        }
-        if ($this->isEnabledWPMLCurrency()) {
-            $default_currency = wcml_get_woocommerce_currency_option();
-            if ($orderCurrency != $default_currency) {
-                $productPrice = $this->convertToDefaultCurrency($productPrice, $orderCurrency);
-            }
+        if (!empty($orderCurrency)) {
+            return $this->convertToDefaultCurrency($productPrice, $orderCurrency);
         }
         return $productPrice;
     }
 
-    function getCurrentCurrencyCode($code)
+    function getCurrentCurrencyCode($code = '')
     {
         if ($this->isEnableRealMagCurrency()) {
             global $WOOCS;
@@ -180,23 +188,16 @@ class Main extends Base
             $multi_currency = $woocommerce_wpml->get_multi_currency();
             return $multi_currency->get_client_currency();
         }
+        if ($this->isEnabledAeliaoCurrency()) {
+            return $GLOBALS['woocommerce-aelia-currencyswitcher']->get_selected_currency();
+        }
         return $code;
     }
 
     function getCartSubtotal($sub_total, $cart_data)
     {
-        if ($this->isEnabledVilaThemeCurrency() && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
-            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
-            $current_currency = $setting->get_current_currency();
-            return $this->convertToDefaultCurrency($sub_total, $current_currency);
-        }
-        if ($this->isEnabledWPMLCurrency()) {
-            global $woocommerce_wpml;
-            $multi_currency = $woocommerce_wpml->get_multi_currency();
-            $current_currency = $multi_currency->get_client_currency();
-            return $this->convertToDefaultCurrency($sub_total, $current_currency);
-        }
-        return $sub_total;
+        $current_currency = $this->getCurrentCurrencyCode();
+        return $this->convertToDefaultCurrency($sub_total, $current_currency);
     }
 
     function getOrderSubtotal($sub_total, $order_data)
@@ -204,10 +205,7 @@ class Main extends Base
         $woocommerce_helper = Woocommerce::getInstance();
         $order = $woocommerce_helper->getOrder($order_data);
         $order_currency = $woocommerce_helper->isMethodExists($order, 'get_currency') ? $order->get_currency() : '';
-        if ($this->isEnabledVilaThemeCurrency() && !empty($order_currency) && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
-            return $this->convertToDefaultCurrency($sub_total, $order_currency);
-        }
-        if ($this->isEnabledWPMLCurrency() && !empty($order_currency)) {
+        if (!empty($order_currency)) {
             return $this->convertToDefaultCurrency($sub_total, $order_currency);
         }
         return $sub_total;
@@ -215,45 +213,22 @@ class Main extends Base
 
     function handleConditionOrderTotal($total, $order)
     {
+        return $this->convertOrderTotal($total, $order);
+    }
+
+    function convertOrderTotal($total, $order)
+    {
         $woocommerce_helper = Woocommerce::getInstance();
         $order_currency = $woocommerce_helper->isMethodExists($order, 'get_currency') ? $order->get_currency() : '';
-        if ($this->isEnabledVilaThemeCurrency() && !empty($order_currency) && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
-            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
-            $default_currency = $setting->get_default_currency();
-            if ($order_currency != $default_currency) {
-                $total = $this->convertToDefaultCurrency($total, $order_currency);
-            }
-            return $total;
-        }
-        if ($this->isEnabledWPMLCurrency() && !empty($order_currency)) {
-            $default_currency = wcml_get_woocommerce_currency_option();
-            if ($order_currency != $default_currency) {
-                $total = $this->convertToDefaultCurrency($total, $order_currency);
-            }
-            return $total;
+        $default_currency = $this->getDefaultCurrency();
+        if ($order_currency != $default_currency) {
+            $total = $this->convertToDefaultCurrency($total, $order_currency);
         }
         return $total;
     }
 
     function handleWoocommerceHelperOrderTotal($total, $order)
     {
-        $woocommerce_helper = Woocommerce::getInstance();
-        $order_currency = $woocommerce_helper->isMethodExists($order, 'get_currency') ? $order->get_currency() : '';
-        if ($this->isEnabledVilaThemeCurrency() && !empty($order_currency) && class_exists('\WOOMULTI_CURRENCY_F_Data')) {
-            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
-            $default_currency = $setting->get_default_currency();
-            if ($order_currency != $default_currency) {
-                $total = $this->convertToDefaultCurrency($total, $order_currency);
-            }
-            return $total;
-        }
-        if ($this->isEnabledWPMLCurrency() && !empty($order_currency)) {
-            $default_currency = wcml_get_woocommerce_currency_option();
-            if ($order_currency != $default_currency) {
-                $total = $this->convertToDefaultCurrency($total, $order_currency);
-            }
-            return $total;
-        }
-        return $total;
+        return $this->convertOrderTotal($total, $order);
     }
 }
