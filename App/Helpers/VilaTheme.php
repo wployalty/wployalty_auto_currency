@@ -10,6 +10,7 @@ namespace Wlac\App\Helpers;
 use Wlr\App\Helpers\Woocommerce;
 
 class VilaTheme implements Currency {
+	public static $instance = null;
 
 	function getDefaultProductPrice( $product_price, $product, $item, $is_redeem, $order_currency ) {
 		return $product_price;
@@ -58,12 +59,19 @@ class VilaTheme implements Currency {
 
 	function convertOrderTotal( $total, $order ) {
 		$woocommerce_helper = Woocommerce::getInstance();
-		$order              = $woocommerce_helper->getOrder( $total );
+		$order              = $woocommerce_helper->getOrder( $order );
 		$order_currency     = $woocommerce_helper->isMethodExists( $order, 'get_currency' ) ? $order->get_currency() : '';
 		if ( ! empty( $order_currency ) ) {
 			return $this->convertToDefaultCurrency( $total, $order_currency );
 		}
 		return $total;
+	}
+
+	public static function getInstance( array $config = array() ) {
+		if ( ! self::$instance ) {
+			self::$instance = new self( $config );
+		}
+		return self::$instance;
 	}
 
 	function getCartSubtotal( $sub_total, $cart_data ) {

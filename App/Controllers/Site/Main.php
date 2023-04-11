@@ -22,6 +22,16 @@ class Main extends Base {
 		}
 	}
 
+	function menuHide() {
+		?>
+        <style>
+            #toplevel_page_wp-loyalty-auto-currency {
+                display: none !important;
+            }
+        </style>
+		<?php
+	}
+
 	function manageLoyaltyPages() {
 		if ( ! Woocommerce::hasAdminPrivilege() ) {
 			wp_die( __( "Don't have access permission", 'wp-loyalty-auto-currency' ) );
@@ -80,7 +90,16 @@ class Main extends Base {
 		if ( $this->isEnableRealMagCurrency() ) {
 			return 'RealMag';
 		}
-		return '';
+		if ( $this->isEnabledVilaThemeCurrency() ) {
+			return "VilaTheme";
+		}
+		if ( $this->isEnabledWPMLCurrency() ) {
+			return 'WPML';
+		}
+		if ( $this->isEnabledAeliaoCurrency() ) {
+			return "Aelia";
+		}
+		return apply_filters( 'wlr_enabled_currency_plugin', '' );
 	}
 
 	/**
@@ -111,6 +130,20 @@ class Main extends Base {
 			self::$active_plugin_list = $active_plugins;
 		}
 		return self::$active_plugin_list;
+	}
+
+	function isEnabledVilaThemeCurrency() {
+		//Ref: https://wordpress.org/plugins/woo-multi-currency/
+		return $this->isPluginIsActive( 'woo-multi-currency/woo-multi-currency.php' );
+	}
+
+	function isEnabledWPMLCurrency() {
+		//ref: https://wordpress.org/plugins/woocommerce-multilingual/
+		return $this->isPluginIsActive( 'woocommerce-multilingual/wpml-woocommerce.php' );
+	}
+
+	function isEnabledAeliaoCurrency() {
+		return $this->isPluginIsActive( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' );
 	}
 
 	function getProductPrice( $productPrice, $item, $is_redeem, $orderCurrency ) {
@@ -254,20 +287,6 @@ class Main extends Base {
 			return $GLOBALS['woocommerce-aelia-currencyswitcher']->base_currency();
 		}
 		return $code;
-	}
-
-	function isEnabledVilaThemeCurrency() {
-		//Ref: https://wordpress.org/plugins/woo-multi-currency/
-		return $this->isPluginIsActive( 'woo-multi-currency/woo-multi-currency.php' );
-	}
-
-	function isEnabledWPMLCurrency() {
-		//ref: https://wordpress.org/plugins/woocommerce-multilingual/
-		return $this->isPluginIsActive( 'woocommerce-multilingual/wpml-woocommerce.php' );
-	}
-
-	function isEnabledAeliaoCurrency() {
-		return $this->isPluginIsActive( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php' );
 	}
 
 

@@ -10,6 +10,7 @@ namespace Wlac\App\Helpers;
 use Wlr\App\Helpers\Woocommerce;
 
 class Aelia implements Currency {
+	public static $instance = null;
 
 	function getDefaultProductPrice( $product_price, $product, $item, $is_redeem, $order_currency ) {
 		$current_code = isset( $GLOBALS['woocommerce-aelia-currencyswitcher'] ) ? $GLOBALS['woocommerce-aelia-currencyswitcher']->get_selected_currency() : '';
@@ -57,6 +58,13 @@ class Aelia implements Currency {
 			return $this->convertToDefaultCurrency( $total, $order_currency );
 		}
 		return $total;
+	}
+
+	public static function getInstance( array $config = array() ) {
+		if ( ! self::$instance ) {
+			self::$instance = new self( $config );
+		}
+		return self::$instance;
 	}
 
 	function getCartSubtotal( $sub_total, $cart_data ) {
