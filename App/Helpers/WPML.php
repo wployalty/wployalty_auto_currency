@@ -54,7 +54,7 @@ class WPML implements Currency {
 
 	function convertOrderTotal( $total, $order ) {
 		$woocommerce_helper = Woocommerce::getInstance();
-		$order              = $woocommerce_helper->getOrder( $total );
+		$order              = $woocommerce_helper->getOrder( $order );
 		$order_currency     = $woocommerce_helper->isMethodExists( $order, 'get_currency' ) ? $order->get_currency() : '';
 		if ( ! empty( $order_currency ) ) {
 			return $this->convertToDefaultCurrency( $total, $order_currency );

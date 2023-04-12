@@ -57,7 +57,8 @@ class RealMag implements Currency {
 
 	function convertOrderTotal( $total, $order ) {
 		$woocommerce_helper = Woocommerce::getInstance();
-		$order_currency     = $woocommerce_helper->isMethodExists( $order, 'get_currency' ) ? $order->get_currency() : '';
+		$order_data         = $woocommerce_helper->isMethodExists( $order, 'get_data' ) ? $order->get_data() : '';
+		$order_currency     = ! empty( $order_data ) && is_array( $order_data ) && isset( $order_data['currency'] ) && ! empty( $order_data['currency'] ) ? $order_data['currency'] : '';
 		$default_currency   = $this->getDefaultCurrency();
 		if ( $order_currency != $default_currency ) {
 			$total = $this->convertToDefaultCurrency( $total, $order_currency );
@@ -80,7 +81,8 @@ class RealMag implements Currency {
 	function getOrderSubtotal( $sub_total, $order_data ) {
 		$woocommerce_helper = Woocommerce::getInstance();
 		$order              = $woocommerce_helper->getOrder( $order_data );
-		$order_currency     = $woocommerce_helper->isMethodExists( $order, 'get_currency' ) ? $order->get_currency() : '';
+		$order_data         = $woocommerce_helper->isMethodExists( $order, 'get_data' ) ? $order->get_data() : '';
+		$order_currency     = ! empty( $order_data ) && is_array( $order_data ) && isset( $order_data['currency'] ) && ! empty( $order_data['currency'] ) ? $order_data['currency'] : '';
 		if ( ! empty( $order_currency ) ) {
 			return $this->convertToDefaultCurrency( $sub_total, $order_currency );
 		}

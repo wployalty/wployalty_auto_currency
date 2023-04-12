@@ -36,7 +36,7 @@ class Router {
 		add_filter( 'wlr_get_cart_subtotal', array( self::$site, 'getCartSubtotal' ), 10, 2 );
 		add_filter( 'wlr_get_order_subtotal', array( self::$site, 'getOrderSubtotal' ), 10, 2 );
 		/*Life time sale value*/
-		add_filter( 'wlr_life_time_sale_value_order_total', array( self::$site, 'handleConditionOrderTotal' ), 10, 2 );
+		//add_filter( 'wlr_life_time_sale_value_order_total', array( self::$site, 'handleConditionOrderTotal' ), 10, 2 );
 		//add_filter( 'wlr_purchase_spent_order_total', array( self::$site, 'handleConditionOrderTotal' ), 10, 2 );
 
 	}
