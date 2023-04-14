@@ -190,32 +190,6 @@ class Main extends Base
         return $this->convertToDefaultCurrency( $sub_total, $current_currency );*/
     }
 
-    function getCurrentCurrencyCode($code = '')
-    {
-        $currency_plugin_helper = $this->getActivePluginObject();
-        if (empty($currency_plugin_helper)) {
-            return $code;
-        }
-        return $currency_plugin_helper->getCurrentCurrencyCode($code);
-        /*if ( $this->isEnableRealMagCurrency() ) {
-            global $WOOCS;
-            return isset( $WOOCS->current_currency ) ? $WOOCS->current_currency : $code;
-        }
-        if ( $this->isEnabledVilaThemeCurrency() && class_exists( '\WOOMULTI_CURRENCY_F_Data' ) ) {
-            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
-            return $setting->get_current_currency();
-        }
-        if ( $this->isEnabledWPMLCurrency() ) {
-            global $woocommerce_wpml;
-            $multi_currency = $woocommerce_wpml->get_multi_currency();
-            return $multi_currency->get_client_currency();
-        }
-        if ( $this->isEnabledAeliaoCurrency() ) {
-            return $GLOBALS['woocommerce-aelia-currencyswitcher']->get_selected_currency();
-        }
-        return $code;*/
-    }
-
     function convertToDefaultCurrency($amount, $current_currency_code)
     {
         $currency_plugin_helper = $this->getActivePluginObject();
@@ -292,6 +266,73 @@ class Main extends Base
         return $this->convertOrderTotal($total, $order);
     }
 
+    function convertDefaultToCurrentAmount($amount, $original_amount, $with_symbol, $currency)
+    {
+        $convert_amount = $this->isEnabledConversionInPage();
+        if ($original_amount <= 0 || !$convert_amount) {
+            return $amount;
+        }
+        $currency_plugin_helper = $this->getActivePluginObject();
+        if (empty($currency_plugin_helper)) {
+            return $amount;
+        }
+        $current_currency = $currency_plugin_helper->getCurrentCurrencyCode($currency);
+        if ($current_currency == $currency) {
+            return $amount;
+        }
+        $amount = $currency_plugin_helper->convertToCurrentCurrency($original_amount, $currency);
+        $current_currency = $currency_plugin_helper->getCurrentCurrencyCode($currency);
+        if ($with_symbol) {
+            $woocommerce_helper = new Woocommerce();
+            $currency_symbol = $woocommerce_helper->getCurrencySymbols($current_currency);
+            $amount = number_format($amount, 2, '.', ',');
+            $formatted_price = '<span class="woocommerce-Price-currencySymbol">' . $currency_symbol . '</span>' . $amount;
+            $amount = '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted_price . '</bdi></span>';
+        }
+        return $amount;
+    }
+
+    function isEnabledConversionInPage()
+    {
+        $options = get_option('wlac_settings', array());
+        return isset($options['enable_conversion_in_page']) && $options['enable_conversion_in_page'] == 1;
+    }
+
+    function getCurrentCurrencyCode($code = '')
+    {
+        $currency_plugin_helper = $this->getActivePluginObject();
+        if (empty($currency_plugin_helper)) {
+            return $code;
+        }
+        return $currency_plugin_helper->getCurrentCurrencyCode($code);
+        /*if ( $this->isEnableRealMagCurrency() ) {
+            global $WOOCS;
+            return isset( $WOOCS->current_currency ) ? $WOOCS->current_currency : $code;
+        }
+        if ( $this->isEnabledVilaThemeCurrency() && class_exists( '\WOOMULTI_CURRENCY_F_Data' ) ) {
+            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+            return $setting->get_current_currency();
+        }
+        if ( $this->isEnabledWPMLCurrency() ) {
+            global $woocommerce_wpml;
+            $multi_currency = $woocommerce_wpml->get_multi_currency();
+            return $multi_currency->get_client_currency();
+        }
+        if ( $this->isEnabledAeliaoCurrency() ) {
+            return $GLOBALS['woocommerce-aelia-currencyswitcher']->get_selected_currency();
+        }
+        return $code;*/
+    }
+
+    function getDisplayCurrency()
+    {
+        $convert_amount = $this->isEnabledConversionInPage();
+        if ($convert_amount) {
+            return $this->getCurrentCurrencyCode();
+        }
+        return $this->getDefaultCurrency();
+    }
+
     function getDefaultCurrency($code = '')
     {
         $currency_plugin_helper = $this->getActivePluginObject();
@@ -315,6 +356,4 @@ class Main extends Base
         }
         return $code;*/
     }
-
-
 }

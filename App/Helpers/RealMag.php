@@ -83,7 +83,11 @@ class RealMag implements Currency
 
     function getCartSubtotal($sub_total, $cart_data)
     {
+        $default_currency = $this->getDefaultCurrency();
         $current_currency = $this->getCurrentCurrencyCode();
+        if ($default_currency == $current_currency) {
+            return $sub_total;
+        }
         return $this->convertToDefaultCurrency($sub_total, $current_currency);
     }
 
@@ -97,5 +101,12 @@ class RealMag implements Currency
             return $this->convertToDefaultCurrency($sub_total, $order_currency);
         }
         return $sub_total;
+    }
+
+    function convertToCurrentCurrency($original_amount, $default_currency)
+    {
+        global $WOOCS;
+        return $WOOCS->woocs_exchange_value($original_amount);
+
     }
 }

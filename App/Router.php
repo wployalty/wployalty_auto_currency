@@ -42,6 +42,7 @@ class Router
         //add_filter( 'wlr_purchase_spent_order_total', array( self::$site, 'handleConditionOrderTotal' ), 10, 2 );
         /*Custom price change*/
         add_filter('wlr_custom_default_currency', array(self::$site, 'getDefaultCurrency'), 10);
-        /*add_filter('wlr_custom_price_convert', array(self::$site, 'convertToDefaultCurrency'), 10, 2);*/
+        add_filter('wlr_custom_price_convert', array(self::$site, 'convertDefaultToCurrentAmount'), 10, 4);
+        add_filter('wlr_custom_display_currency', array(self::$site, 'getDisplayCurrency'), 10);
     }
 }
