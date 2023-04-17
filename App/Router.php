@@ -25,6 +25,8 @@ class Router
         if (is_admin()) {
             add_action('admin_menu', array(self::$site, 'addMenu'));
             add_action('admin_footer', array(self::$site, 'menuHide'));
+            add_action('admin_enqueue_scripts', array(self::$site, 'adminScripts'), 100);
+            add_action('wp_ajax_wlac_save_settings', array(self::$site, 'saveSettings'));
         }
         add_filter('wlr_default_product_price', array(self::$site, 'getDefaultProductPrice'), 10, 5);
         add_filter('wlr_product_price', array(self::$site, 'getProductPrice'), 10, 4);

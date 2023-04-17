@@ -7,8 +7,6 @@
 
 namespace Wlac\App\Controllers;
 
-use Wlr\App\Helpers\Input;
-use Wlr\App\Helpers\Template;
 use Wlr\App\Helpers\Woocommerce;
 
 defined('ABSPATH') or die;

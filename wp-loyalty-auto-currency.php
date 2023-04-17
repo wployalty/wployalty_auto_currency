@@ -26,15 +26,18 @@ if (!function_exists('isWployaltyActiveOrNot')) {
         if (is_multisite()) {
             $active_plugins = array_merge($active_plugins, get_site_option('active_sitewide_plugins', array()));
         }
-        return in_array('wp-loyalty-rules/wp-loyalty-rules.php', $active_plugins, false) || in_array('wp-loyalty-rules-lite/wp-loyalty-rules-lite.php', $active_plugins, false);
+        return in_array('wp-loyalty-rules/wp-loyalty-rules.php', $active_plugins, false) || in_array('wp-loyalty-rules-lite/wp-loyalty-rules-lite.php', $active_plugins, false) || in_array('wployalty/wp-loyalty-rules-lite.php', $active_plugins, false);
     }
 }
 if (!isWployaltyActiveOrNot()) {
     return;
 }
 //Define the plugin version
+defined('WLAC_PLUGIN_VERSION') or define('WLAC_PLUGIN_VERSION', '1.0.0');
 defined('WLAC_PLUGIN_SLUG') or define('WLAC_PLUGIN_SLUG', 'wp-loyalty-auto-currency');
 defined('WLAC_PLUGIN_PATH') or define('WLAC_PLUGIN_PATH', __DIR__ . '/');
+defined('WLAC_PLUGIN_URL') or define('WLAC_PLUGIN_URL', plugin_dir_url(__FILE__));
+
 if (!class_exists('\Wlac\App\Router')) {
     if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
         return;

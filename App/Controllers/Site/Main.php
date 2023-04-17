@@ -10,7 +10,9 @@ namespace Wlac\App\Controllers\Site;
 defined('ABSPATH') or die;
 
 use Wlac\App\Controllers\Base;
+use Wlr\App\Helpers\Input;
 use Wlr\App\Helpers\Template;
+use Wlr\App\Helpers\Validation;
 use Wlr\App\Helpers\Woocommerce;
 
 class Main extends Base
@@ -22,6 +24,39 @@ class Main extends Base
         if (Woocommerce::hasAdminPrivilege()) {
             add_menu_page(__('WPLoyalty: Auto Currency Change', 'wp-loyalty-auto-currency'), __('WPLoyalty: Auto Currency Change', 'wp-loyalty-auto-currency'), 'manage_woocommerce', WLAC_PLUGIN_SLUG, array($this, 'manageLoyaltyPages'), 'dashicons-megaphone', 57);
         }
+    }
+
+    function adminScripts()
+    {
+        if (!Woocommerce::hasAdminPrivilege()) {
+            return;
+        }
+        $page = isset($_REQUEST['page']) && $_REQUEST['page'];
+        if ($page != WLAC_PLUGIN_SLUG) {
+            return;
+        }
+        $suffix = '.min';
+        if (defined('SCRIPT_DEBUG')) {
+            $suffix = SCRIPT_DEBUG ? '' : '.min';
+        }
+        if ($page == WLAC_PLUGIN_SLUG) {
+            remove_all_actions('admin_notices');
+        }
+
+        wp_enqueue_style(WLR_PLUGIN_SLUG . '-alertify', WLR_PLUGIN_URL . 'Assets/Admin/Css/alertify' . $suffix . '.css', array(), WLR_PLUGIN_VERSION);
+        wp_enqueue_script(WLR_PLUGIN_SLUG . '-alertify', WLR_PLUGIN_URL . 'Assets/Admin/Js/alertify' . $suffix . '.js', array(), WLR_PLUGIN_VERSION . '&t=' . time());
+
+        wp_register_script(WLAC_PLUGIN_SLUG . '-main', WLAC_PLUGIN_URL . 'Assets/Admin/Js/wlac-admin.js', array('jquery'), WLAC_PLUGIN_VERSION . '&t=' . time());
+        wp_enqueue_script(WLAC_PLUGIN_SLUG . '-main');
+        wp_enqueue_style(WLAC_PLUGIN_SLUG . '-main', WLAC_PLUGIN_URL . 'Assets/Admin/Css/wlac-admin.css', array(), WLAC_PLUGIN_VERSION);
+        $localize = array(
+            'home_url' => get_home_url(),
+            'admin_url' => admin_url(),
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'saving_button_label' => __("Saving...", "wp-loyalty-auto-currency"),
+            'saved_button_label' => __("Save Changes", "wp-loyalty-auto-currency"),
+        );
+        wp_localize_script(WLAC_PLUGIN_SLUG . '-main', 'wlac_localize_data', $localize);
     }
 
     function menuHide()
@@ -46,7 +81,11 @@ class Main extends Base
         }
         $template = new Template();
         $path = WLAC_PLUGIN_PATH . 'App/Views/main.php';
-        $main_page_params = array();
+        $main_page_params = array(
+            'options' => get_option('wlac_settings', array()),
+            'app_url' => admin_url('admin.php?' . http_build_query(array('page' => WLR_PLUGIN_SLUG))) . '#/apps',
+            'wlac_setting_nonce' => Woocommerce::create_nonce('wlac-setting-nonce'),
+        );
         $template->setData($path, $main_page_params)->display();
     }
 
@@ -295,7 +334,7 @@ class Main extends Base
     function isEnabledConversionInPage()
     {
         $options = get_option('wlac_settings', array());
-        return isset($options['enable_conversion_in_page']) && $options['enable_conversion_in_page'] == 1;
+        return isset($options['enable_conversion_in_page']) && $options['enable_conversion_in_page'] == 'yes';
     }
 
     function getCurrentCurrencyCode($code = '')
@@ -355,5 +394,41 @@ class Main extends Base
             return $GLOBALS['woocommerce-aelia-currencyswitcher']->base_currency();
         }
         return $code;*/
+    }
+
+    function saveSettings()
+    {
+        $response = array();
+        $input = new Input();
+        $wlac_nonce = (string)$input->post('wlac_nonce');
+        if (!Woocommerce::hasAdminPrivilege() || !Woocommerce::verify_nonce($wlac_nonce, 'wlac-setting-nonce')) {
+            $response['error'] = true;
+            $response['message'] = esc_html__('Settings not saved!', 'wp-loyalty-auto-currency');
+            wp_send_json($response);
+        }
+        $key = (string)$input->post('option_key');
+        $key = Validation::validateInputAlpha($key);
+        if (!empty($key)) {
+            $enable_conversion_in_page = $input->post_get('enable_conversion_in_page');
+            if (!in_array($enable_conversion_in_page, array('yes', 'no'))) {
+                $response['error'] = true;
+                $response['field_error'] = array(
+                    'enable_conversion_in_page' => __('This field have invalid strings', 'wp-loyalty-auto-currency')
+                );
+                $response['message'] = esc_html__('Settings not saved!', 'wp-loyalty-auto-currency');
+                wp_send_json($response);
+            }
+            $data = array(
+                'enable_conversion_in_page' => $enable_conversion_in_page
+            );
+            update_option($key, $data, true);
+            do_action('wlac_after_save_settings', $data, $key);
+            $response['error'] = false;
+            $response['message'] = esc_html__('Settings saved successfully!', 'wp-loyalty-auto-currency');
+        } else {
+            $response['error'] = true;
+            $response['message'] = esc_html__('Settings not saved!', 'wp-loyalty-auto-currency');
+        }
+        wp_send_json($response);
     }
 }
