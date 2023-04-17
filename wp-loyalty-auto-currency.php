@@ -33,6 +33,7 @@ if (!isWployaltyActiveOrNot()) {
     return;
 }
 //Define the plugin version
+defined('WLAC_PLUGIN_NAME') or define('WLAC_PLUGIN_NAME', 'WPLoyalty - Auto currency');
 defined('WLAC_PLUGIN_VERSION') or define('WLAC_PLUGIN_VERSION', '1.0.0');
 defined('WLAC_PLUGIN_SLUG') or define('WLAC_PLUGIN_SLUG', 'wp-loyalty-auto-currency');
 defined('WLAC_PLUGIN_PATH') or define('WLAC_PLUGIN_PATH', __DIR__ . '/');
