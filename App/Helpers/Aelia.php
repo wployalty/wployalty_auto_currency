@@ -95,6 +95,7 @@ class Aelia implements Currency
     function convertToCurrentCurrency($original_amount, $default_currency)
     {
         $current_currency_code = $this->getCurrentCurrencyCode();
-        return (float)$GLOBALS['woocommerce-aelia-currencyswitcher']->convert($original_amount, $default_currency, $current_currency_code, $price_decimals = null, $include_markup = true);
+        $price_decimals = null;
+        return (float)$GLOBALS['woocommerce-aelia-currencyswitcher']->convert($original_amount, $default_currency, $current_currency_code, $price_decimals, $include_markup = true);
     }
 }

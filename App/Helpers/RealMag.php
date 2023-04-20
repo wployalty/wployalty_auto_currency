@@ -106,7 +106,13 @@ class RealMag implements Currency
     function convertToCurrentCurrency($original_amount, $default_currency)
     {
         global $WOOCS;
-        return $WOOCS->woocs_exchange_value($original_amount);
-
+        $currencies = $WOOCS->get_currencies();
+        $current_currency_code = $this->getCurrentCurrencyCode();
+        if (isset($currencies[$current_currency_code]) && isset($currencies[$current_currency_code]['rate'])) {
+            $original_amount = floatval($original_amount) * floatval($currencies[$current_currency_code]['rate']);
+        } else {
+            $original_amount = $WOOCS->woocs_exchange_value($original_amount);
+        }
+        return $original_amount;
     }
 }
