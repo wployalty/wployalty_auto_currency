@@ -10,7 +10,7 @@
  * Domain Path: /i18n/languages/
  * Requires at least: 4.9.0
  * WC requires at least: 6.5
- * WC tested up to: 7.3
+ * WC tested up to: 7.5
  * Contributors: Wployalty, Alagesan
  * Author URI: https://wployalty.net/
  * License: GPLv2 or later
