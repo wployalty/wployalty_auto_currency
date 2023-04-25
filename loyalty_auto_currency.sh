@@ -15,7 +15,7 @@ copy_folder() {
   cd $current_dir
   from_folder="wployalty_auto_currency"
   from_folder_dir=$current_dir$from_folder
-  move_dir=("App" "Assets" "i18n" "vendor" "wp-loyalty-auto-currency.php")
+  move_dir=("App" "Assets" "i18n" "vendor" "readme.txt" "wp-loyalty-auto-currency.php")
   if [ -d "$pack_compress_folder" ]; then
     rm -r "$pack_folder"
     mkdir "$pack_folder"
