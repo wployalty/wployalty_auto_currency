@@ -46,6 +46,12 @@ if (!class_exists('\Wlac\App\Router')) {
     require __DIR__ . '/vendor/autoload.php';
 }
 if (class_exists('\Wlac\App\Router')) {
+    $myUpdateChecker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+        'https://github.com/wployalty/wployalty_auto_currency',
+        __FILE__,
+        'wp-loyalty-auto-currency'
+    );
+    $myUpdateChecker->getVcsApi()->enableReleaseAssets();
     $router = new \Wlac\App\Router();
     $router->init();
 }
