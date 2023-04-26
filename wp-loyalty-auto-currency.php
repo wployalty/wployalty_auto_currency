@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WPLoyalty - Auto Currency
  * Plugin URI: https://www.wployalty.net
- * Description: WPLoyalty - Auto Currency used to convert amount automatically
+ * Description: Adds multi-currency support for WPLoyalty with automatic currency conversion compatibility with 4 popular multicurrency plugins for WooCommerce
  * Version: 1.0.0
  * Author: Wployalty
  * Slug: wp-loyalty-auto-currency

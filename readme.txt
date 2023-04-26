@@ -11,11 +11,16 @@ Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-WPLoyalty - Auto Currency used convert amount automatically
+Adds multi-currency support for WPLoyalty with automatic currency conversion compatibility with 4 popular multicurrency plugins for WooCommerce
 
 == Description ==
 
-[WPLoyalty - Auto Currency](https://wployalty.net?utm_campaign=wpl_auto_currency&utm_source=gitrepo&utm_medium=listing) used convert amount automatically.
+[WPLoyalty - Auto Currency](https://wployalty.net?utm_campaign=wpl_auto_currency&utm_source=gitrepo&utm_medium=listing) adds automatic currency conversion support.
+The plugin is compatible with the following 4 multi-currency plugins for WooCommerce:
+- [CURCY – Multi Currency for WooCommerce](https://wordpress.org/plugins/woo-multi-currency/)
+- [WooCommerce Multilingual & Multicurrency with WPML](https://wordpress.org/plugins/woocommerce-multilingual/)
+- [Aelia Currency Switcher for WooCommerce](https://aelia.co/shop/currency-switcher-woocommerce/)
+- [FOX – Currency Switcher Professional for WooCommerce](https://wordpress.org/plugins/woocommerce-currency-switcher/)
 
 == Installation ==
 
