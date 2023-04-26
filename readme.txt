@@ -15,7 +15,7 @@ WPLoyalty - Auto Currency used convert amount automatically
 
 == Description ==
 
-[WPLoyalty - Auto Currency](https://wployalty.net?utm_campaign=wpl_auto_currency&utm_source=wprepo&utm_medium=listing) used convert amount automatically.
+[WPLoyalty - Auto Currency](https://wployalty.net?utm_campaign=wpl_auto_currency&utm_source=gitrepo&utm_medium=listing) used convert amount automatically.
 
 == Installation ==
 
