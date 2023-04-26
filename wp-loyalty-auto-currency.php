@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WPLoyalty - Auto Currency earning
+ * Plugin Name: WPLoyalty - Auto Currency
  * Plugin URI: https://www.wployalty.net
  * Description: Auto currency
  * Version: 1.0.0

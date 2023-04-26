@@ -1,4 +1,4 @@
-=== WPLoyalty - Auto Currency earning ===
+=== WPLoyalty - Auto Currency ===
 Contributors: wployalty
 Donate link: https://wployalty.net
 Tags: points, rewards, loyalty, woocommerce points and rewards, points and rewards, woocommerce loyalty, woocommerce rewards, woocommerce reward program, woocommerce loyalty program, reward system
@@ -6,16 +6,16 @@ Requires at least: 4.9.0
 Tested up to: 6.2
 WC requires at least: 6.5.0
 WC tested up to: 7.5.0
-Stable tag: 1.2.1
+Stable tag: 1.0.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-WPLoyalty - Auto Currency conversion used convert amount automatically
+WPLoyalty - Auto Currency used convert amount automatically
 
 == Description ==
 
-[WPLoyalty - Auto Currency Conversion](https://wployalty.net?utm_campaign=wplfree&utm_source=wprepo&utm_medium=listing) used convert amount automatically.
+[WPLoyalty - Auto Currency](https://wployalty.net?utm_campaign=wpl_auto_currency&utm_source=wprepo&utm_medium=listing) used convert amount automatically.
 
 == Installation ==
 
