@@ -334,7 +334,7 @@ class Main extends Base
     function isEnabledConversionInPage()
     {
         $options = get_option('wlac_settings', array());
-        return isset($options['enable_conversion_in_page']) && $options['enable_conversion_in_page'] == 'yes';
+        return (empty($options) || !isset($options['enable_conversion_in_page'])) || ($options['enable_conversion_in_page'] == 'yes');
     }
 
     function getCurrentCurrencyCode($code = '')

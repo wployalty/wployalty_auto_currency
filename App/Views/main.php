@@ -6,7 +6,7 @@
  * */
 
 defined('ABSPATH') or die;
-$enable_conversion_in_page = isset($options['enable_conversion_in_page']) && $options['enable_conversion_in_page'] == 'yes';
+$enable_conversion_in_page = (empty($options) || !isset($options['enable_conversion_in_page'])) || ($options['enable_conversion_in_page'] == 'yes');
 ?>
 <div id="wlac-main">
     <div class="wlac-main-header">
@@ -48,14 +48,14 @@ $enable_conversion_in_page = isset($options['enable_conversion_in_page']) && $op
                             <div class="wlac-field-block">
                                 <div>
                                     <label
-                                        class="wlac-settings-enable-conversion-label"><?php esc_html_e('Enable Currency conversion in WPLoyalty pages', 'wp-loyalty-auto-currency'); ?></label>
+                                            class="wlac-settings-enable-conversion-label"><?php esc_html_e('Enable Currency conversion in WPLoyalty pages', 'wp-loyalty-auto-currency'); ?></label>
                                 </div>
                                 <div class="wlac-input-field">
                                     <select name="enable_conversion_in_page">
                                         <option
-                                            value="no" <?php echo !$enable_conversion_in_page ? 'selected="selected"' : ''; ?> ><?php esc_html_e('No', 'wp-loyalty-auto-currency'); ?></option>
+                                                value="no" <?php echo !$enable_conversion_in_page ? 'selected="selected"' : ''; ?> ><?php esc_html_e('No', 'wp-loyalty-auto-currency'); ?></option>
                                         <option
-                                            value="yes" <?php echo $enable_conversion_in_page ? 'selected="selected"' : ''; ?>><?php esc_html_e('Yes', 'wp-loyalty-auto-currency'); ?></option>
+                                                value="yes" <?php echo $enable_conversion_in_page ? 'selected="selected"' : ''; ?>><?php esc_html_e('Yes', 'wp-loyalty-auto-currency'); ?></option>
                                     </select>
                                 </div>
                             </div>
