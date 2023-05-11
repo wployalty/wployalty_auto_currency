@@ -47,5 +47,6 @@ class Router
         add_filter('wlr_custom_price_convert', array(self::$site, 'convertDefaultToCurrentAmount'), 10, 4);
         add_filter('wlr_custom_display_currency', array(self::$site, 'getDisplayCurrency'), 10);
         add_filter('wlr_page_user_reward_list', array(self::$site, 'handleActionShortCodes'), 10);
+        add_filter('wlr_page_reward_list', array(self::$site, 'handleRewardShortCodes'), 10, 2);
     }
 }

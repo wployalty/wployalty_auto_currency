@@ -449,4 +449,22 @@ class Main extends Base
         }
         return $amount;
     }
+
+    function handleRewardShortCodes($reward_list, $is_guest_user)
+    {
+        foreach ($reward_list as $reward) {
+            if ($reward->discount_type == 'points_conversion') {
+                $default_currency = $this->getDefaultCurrency();
+                $conversion_value = $this->convertDefaultToCurrentAmount(wc_price($reward->discount_value, array('currency' => $default_currency)), $reward->discount_value, true, $default_currency);
+                $short_codes = array(
+                    '[wlr_conversion_price]' => sanitize_text_field($conversion_value)
+                );
+                foreach ($short_codes as $key => $value) {
+                    $reward->name = str_replace($key, $value, $reward->name);
+                    $reward->description = str_replace($key, $value, $reward->description);
+                }
+            }
+        }
+        return $reward_list;
+    }
 }
