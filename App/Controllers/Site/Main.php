@@ -305,30 +305,13 @@ class Main extends Base
         return $this->convertOrderTotal($total, $order);
     }
 
-    function convertDefaultToCurrentAmount($amount, $original_amount, $with_symbol, $currency)
+    function getDisplayCurrency()
     {
         $convert_amount = $this->isEnabledConversionInPage();
-        if ($original_amount <= 0 || !$convert_amount) {
-            return $amount;
+        if ($convert_amount) {
+            return $this->getCurrentCurrencyCode();
         }
-        $currency_plugin_helper = $this->getActivePluginObject();
-        if (empty($currency_plugin_helper)) {
-            return $amount;
-        }
-        $current_currency = $currency_plugin_helper->getCurrentCurrencyCode($currency);
-        if ($current_currency == $currency) {
-            return $amount;
-        }
-        $amount = $currency_plugin_helper->convertToCurrentCurrency($original_amount, $currency);
-        $current_currency = $currency_plugin_helper->getCurrentCurrencyCode($currency);
-        if ($with_symbol) {
-            $woocommerce_helper = new Woocommerce();
-            $currency_symbol = $woocommerce_helper->getCurrencySymbols($current_currency);
-            $amount = number_format($amount, 2, '.', ',');
-            $formatted_price = '<span class="woocommerce-Price-currencySymbol">' . $currency_symbol . '</span>' . $amount;
-            $amount = '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted_price . '</bdi></span>';
-        }
-        return $amount;
+        return $this->getDefaultCurrency();
     }
 
     function isEnabledConversionInPage()
@@ -361,15 +344,6 @@ class Main extends Base
             return $GLOBALS['woocommerce-aelia-currencyswitcher']->get_selected_currency();
         }
         return $code;*/
-    }
-
-    function getDisplayCurrency()
-    {
-        $convert_amount = $this->isEnabledConversionInPage();
-        if ($convert_amount) {
-            return $this->getCurrentCurrencyCode();
-        }
-        return $this->getDefaultCurrency();
     }
 
     function getDefaultCurrency($code = '')
@@ -430,5 +404,49 @@ class Main extends Base
             $response['message'] = esc_html__('Settings not saved!', 'wp-loyalty-auto-currency');
         }
         wp_send_json($response);
+    }
+
+    function handleActionShortCodes($user_reward_list)
+    {
+        foreach ($user_reward_list as $user_reward) {
+            if ($user_reward->discount_type == 'points_conversion') {
+                $default_currency = $this->getDefaultCurrency();
+                $conversion_value = $this->convertDefaultToCurrentAmount(wc_price($user_reward->discount_value, array('currency' => $default_currency)), $user_reward->discount_value, true, $default_currency);
+                $short_codes = array(
+                    '[wlr_conversion_price]' => sanitize_text_field($conversion_value)
+                );
+                foreach ($short_codes as $key => $value) {
+                    $user_reward->name = str_replace($key, $value, $user_reward->name);
+                    $user_reward->description = str_replace($key, $value, $user_reward->description);
+                }
+            }
+        }
+        return $user_reward_list;
+    }
+
+    function convertDefaultToCurrentAmount($amount, $original_amount, $with_symbol, $currency)
+    {
+        $convert_amount = $this->isEnabledConversionInPage();
+        if ($original_amount <= 0 || !$convert_amount) {
+            return $amount;
+        }
+        $currency_plugin_helper = $this->getActivePluginObject();
+        if (empty($currency_plugin_helper)) {
+            return $amount;
+        }
+        $current_currency = $currency_plugin_helper->getCurrentCurrencyCode($currency);
+        if ($current_currency == $currency) {
+            return $amount;
+        }
+        $amount = $currency_plugin_helper->convertToCurrentCurrency($original_amount, $currency);
+        $current_currency = $currency_plugin_helper->getCurrentCurrencyCode($currency);
+        if ($with_symbol) {
+            $woocommerce_helper = new Woocommerce();
+            $currency_symbol = $woocommerce_helper->getCurrencySymbols($current_currency);
+            $amount = number_format($amount, 2, '.', ',');
+            $formatted_price = '<span class="woocommerce-Price-currencySymbol">' . $currency_symbol . '</span>' . $amount;
+            $amount = '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted_price . '</bdi></span>';
+        }
+        return $amount;
     }
 }
