@@ -413,7 +413,7 @@ class Main extends Base
                 $default_currency = $this->getDefaultCurrency();
                 $conversion_value = $this->convertDefaultToCurrentAmount(wc_price($user_reward->discount_value, array('currency' => $default_currency)), $user_reward->discount_value, true, $default_currency);
                 $short_codes = array(
-                    '[wlr_conversion_price]' => sanitize_text_field($conversion_value)
+                    '[wlr_conversion_value]' => sanitize_text_field($conversion_value)
                 );
                 foreach ($short_codes as $key => $value) {
                     $user_reward->name = str_replace($key, $value, $user_reward->name);
@@ -457,7 +457,7 @@ class Main extends Base
                 $default_currency = $this->getDefaultCurrency();
                 $conversion_value = $this->convertDefaultToCurrentAmount(wc_price($reward->discount_value, array('currency' => $default_currency)), $reward->discount_value, true, $default_currency);
                 $short_codes = array(
-                    '[wlr_conversion_price]' => sanitize_text_field($conversion_value)
+                    '[wlr_conversion_value]' => sanitize_text_field($conversion_value)
                 );
                 foreach ($short_codes as $key => $value) {
                     $reward->name = str_replace($key, $value, $reward->name);
