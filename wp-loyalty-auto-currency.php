@@ -4,14 +4,14 @@
  * Plugin URI: https://www.wployalty.net
  * Description: Adds multi-currency support for WPLoyalty with automatic currency conversion compatibility with 4 popular multicurrency plugins for WooCommerce
  * Version: 1.0.0
- * Author: Wployalty
+ * Author: WPLoyalty
  * Slug: wp-loyalty-auto-currency
  * Text Domain: wp-loyalty-auto-currency
  * Domain Path: /i18n/languages/
  * Requires at least: 4.9.0
  * WC requires at least: 6.5
  * WC tested up to: 7.5
- * Contributors: Wployalty, Alagesan
+ * Contributors: Alagesan
  * Author URI: https://wployalty.net/
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
