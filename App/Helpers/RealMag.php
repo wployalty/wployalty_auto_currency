@@ -115,4 +115,16 @@ class RealMag implements Currency
         }
         return $original_amount;
     }
+
+    function getPriceFormat($amount, $code = '')
+    {
+        if (empty($code)) {
+            return false;
+        }
+        $woocommerce_helper = new Woocommerce();
+        $currency_symbol = $woocommerce_helper->getCurrencySymbols($code);
+        $amount = number_format($amount, 2, '.', ',');
+        $formatted_price = '<span class="woocommerce-Price-currencySymbol">' . $currency_symbol . '</span>' . $amount;
+        return '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted_price . '</bdi></span>';
+    }
 }

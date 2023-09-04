@@ -1,21 +1,23 @@
 <?php
 
 namespace Wlac\App\Helpers;
-interface Currency {
-	function getDefaultProductPrice( $product_price, $product, $item, $is_redeem, $order_currency );
+interface Currency
+{
+    function getDefaultProductPrice($product_price, $product, $item, $is_redeem, $order_currency);
 
-	function getProductPrice( $product_price, $item, $is_redeem, $order_currency );
+    function getProductPrice($product_price, $item, $is_redeem, $order_currency);
 
-	function convertToDefaultCurrency( $amount, $current_currency_code );
+    function convertToDefaultCurrency($amount, $current_currency_code);
 
-	function getCurrentCurrencyCode( $code = '' );
+    function getCurrentCurrencyCode($code = '');
 
-	function convertOrderTotal( $total, $order );
+    function convertOrderTotal($total, $order);
 
-	function getCartSubtotal( $sub_total, $cart_data );
+    function getCartSubtotal($sub_total, $cart_data);
 
-	function getOrderSubtotal( $sub_total, $order_data );
+    function getOrderSubtotal($sub_total, $order_data);
 
-	function getDefaultCurrency( $code = '' );
+    function getDefaultCurrency($code = '');
 
+    function getPriceFormat($amount, $code);
 }
