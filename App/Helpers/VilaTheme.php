@@ -116,11 +116,57 @@ class VilaTheme implements Currency
         if (!class_exists('\WOOMULTI_CURRENCY_F_Data')) {
             return $amount;
         }
+        $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+        $selected_currencies = $setting->get_list_currencies();
+        $currency = isset($selected_currencies[$code]) && is_array($selected_currencies[$code]) ? $selected_currencies[$code] : array();
+        if (empty($currency)) {
+            return $amount;
+        }
+        $currency_symbol = $this->getCurrencySymbol($currency, $code);
+        $num_decimal = is_array($currency) && !empty($currency['decimals']) ? $currency['decimals'] : wc_get_price_decimals();
+        $decimal_sep = wc_get_price_decimal_separator();
+        $thousand_sep = wc_get_price_thousand_separator();
 
-        $woocommerce_helper = new Woocommerce();
-        $currency_symbol = $woocommerce_helper->getCurrencySymbols($code);
-        $amount = number_format($amount, 2, '.', ',');
-        $formatted_price = '<span class="woocommerce-Price-currencySymbol">' . $currency_symbol . '</span>' . $amount;
+        $amount = number_format($amount, $num_decimal, $decimal_sep, $thousand_sep);
+        $price_format = $this->getFormat($currency, $code);
+        $formatted_price = sprintf($price_format, '<span class="woocommerce-Price-currencySymbol">' . $currency_symbol . '</span>', $amount);
         return '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted_price . '</bdi></span>';
+    }
+
+    protected function getCurrencySymbol($current_currency, $code)
+    {
+        $woocommerce_helper = new Woocommerce();
+        if (!is_array($current_currency)) {
+            return $woocommerce_helper->getCurrencySymbols($code);
+        }
+        if (isset($current_currency['custom']) && !empty($current_currency['custom'])) {
+            return $current_currency['custom'];
+        }
+        return $woocommerce_helper->getCurrencySymbols($code);
+    }
+
+    protected function getFormat($currency, $code = '')
+    {
+        $format = get_woocommerce_price_format();
+        if (empty($code)) {
+            return $format;
+        }
+        if (is_array($currency) && !empty($currency['pos'])) {
+            switch ($currency['pos']) {
+                case 'left':
+                    $format = '%1$s%2$s';
+                    break;
+                case 'right':
+                    $format = '%2$s%1$s';
+                    break;
+                case 'left_space':
+                    $format = '%1$s&nbsp;%2$s';
+                    break;
+                case 'right_space':
+                    $format = '%2$s&nbsp;%1$s';
+                    break;
+            }
+        }
+        return $format;
     }
 }
