@@ -426,12 +426,19 @@ class Main extends Base
 
     function convertDefaultToCurrentAmount($amount, $original_amount, $with_symbol, $currency)
     {
-        $convert_amount = $this->isEnabledConversionInPage();
-        if ($original_amount <= 0 || !$convert_amount) {
+
+        if ($original_amount <= 0) {
             return $amount;
         }
         $currency_plugin_helper = $this->getActivePluginObject();
         if (empty($currency_plugin_helper)) {
+            return $amount;
+        }
+        $convert_amount = $this->isEnabledConversionInPage();
+        if (!$convert_amount) {
+            if ($with_symbol && $currency) {
+                return $currency_plugin_helper->getPriceFormat($original_amount, $currency);
+            }
             return $amount;
         }
         $current_currency = $currency_plugin_helper->getCurrentCurrencyCode($currency);
