@@ -136,6 +136,9 @@ class Main extends Base
         if ($this->isEnableRealMagCurrency()) {
             return 'RealMag';
         }
+        if ($this->isEnabledPremiumVilaThemeCurrency()) {
+            return "PremiumVilaTheme";
+        }
         if ($this->isEnabledVilaThemeCurrency()) {
             return "VilaTheme";
         }
@@ -185,6 +188,12 @@ class Main extends Base
     {
         //Ref: https://wordpress.org/plugins/woo-multi-currency/
         return $this->isPluginIsActive('woo-multi-currency/woo-multi-currency.php');
+    }
+
+    function isEnabledPremiumVilaThemeCurrency()
+    {
+        //Ref: https://wordpress.org/plugins/woocommerce-multi-currency/
+        return $this->isPluginIsActive('woocommerce-multi-currency/woocommerce-multi-currency.php');
     }
 
     function isEnabledWPMLCurrency()
