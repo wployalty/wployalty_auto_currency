@@ -98,4 +98,63 @@ class Aelia implements Currency
         $price_decimals = null;
         return (float)$GLOBALS['woocommerce-aelia-currencyswitcher']->convert($original_amount, $default_currency, $current_currency_code, $price_decimals, $include_markup = true);
     }
+
+    function getPriceFormat($amount, $code = '')
+    {
+        if (empty($code)) {
+            return $amount;
+        }
+        if (!isset($GLOBALS['woocommerce-aelia-currencyswitcher'])) return $amount;
+        $settings = $GLOBALS['woocommerce-aelia-currencyswitcher']::settings()->current_settings();
+        $currency = is_array($settings['exchange_rates']) && isset($settings['exchange_rates'][$code]) && is_array($settings['exchange_rates'][$code]) ? $settings['exchange_rates'][$code] : array();
+        if (empty($currency)) {
+            return $amount;
+        }
+        $currency_symbol = $this->getCurrencySymbol($currency, $code);
+        $num_decimal = is_array($currency) && !empty($currency['decimals']) ? $currency['decimals'] : wc_get_price_decimals();
+        $decimal_sep = is_array($currency) && !empty($currency['decimal_separator']) ? $currency['decimal_separator'] : wc_get_price_decimal_separator();
+        $thousand_sep = is_array($currency) && !empty($currency['thousand_separator']) ? $currency['thousand_separator'] : wc_get_price_thousand_separator();
+        $amount = number_format($amount, $num_decimal, $decimal_sep, $thousand_sep);
+        $price_format = $this->getFormat($currency, $code);
+        $formatted_price = sprintf($price_format, '<span class="woocommerce-Price-currencySymbol">' . $currency_symbol . '</span>', $amount);
+        return '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted_price . '</bdi></span>';
+    }
+
+    protected function getCurrencySymbol($current_currency, $code)
+    {
+        $woocommerce_helper = new Woocommerce();
+        if (!is_array($current_currency)) {
+            return $woocommerce_helper->getCurrencySymbols($code);
+        }
+        if (isset($current_currency['symbol']) && !empty($current_currency['symbol'])) {
+            return $current_currency['symbol'];
+        }
+        return $woocommerce_helper->getCurrencySymbols($code);
+    }
+
+    protected function getFormat($currency, $code = '')
+    {
+        $format = get_woocommerce_price_format();
+        if (empty($code)) {
+            return $format;
+        }
+        if (is_array($currency) && !empty($currency['symbol_position'])) {
+            switch ($currency['symbol_position']) {
+                case 'left':
+                    $format = '%1$s%2$s';
+                    break;
+                case 'right':
+                    $format = '%2$s%1$s';
+                    break;
+                case 'left_space':
+                    $format = '%1$s&nbsp;%2$s';
+                    break;
+                case 'right_space':
+                    $format = '%2$s&nbsp;%1$s';
+                    break;
+            }
+        }
+        return $format;
+    }
+
 }

@@ -426,28 +426,35 @@ class Main extends Base
 
     function convertDefaultToCurrentAmount($amount, $original_amount, $with_symbol, $currency)
     {
-        $convert_amount = $this->isEnabledConversionInPage();
-        if ($original_amount <= 0 || !$convert_amount) {
+
+        if ($original_amount <= 0) {
             return $amount;
         }
         $currency_plugin_helper = $this->getActivePluginObject();
         if (empty($currency_plugin_helper)) {
             return $amount;
         }
+        $convert_amount = $this->isEnabledConversionInPage();
+        if (!$convert_amount) {
+            if ($with_symbol && $currency) {
+                return $currency_plugin_helper->getPriceFormat($original_amount, $currency);
+            }
+            return $amount;
+        }
         $current_currency = $currency_plugin_helper->getCurrentCurrencyCode($currency);
         if ($current_currency == $currency) {
-            return apply_filters('wlac_after_convert_amount',$amount,$original_amount,$with_symbol,$currency);
+            return apply_filters('wlac_after_convert_amount', $amount, $original_amount, $with_symbol, $currency);
         }
         $amount = $modified_amount = $currency_plugin_helper->convertToCurrentCurrency($original_amount, $currency);
-        $current_currency = $currency_plugin_helper->getCurrentCurrencyCode($currency);
         if ($with_symbol) {
-            $woocommerce_helper = new Woocommerce();
+            $amount = $currency_plugin_helper->getPriceFormat($modified_amount, $current_currency);
+            /*$woocommerce_helper = new Woocommerce();
             $currency_symbol = $woocommerce_helper->getCurrencySymbols($current_currency);
             $amount = number_format($modified_amount, 2, '.', ',');
             $formatted_price = '<span class="woocommerce-Price-currencySymbol">' . $currency_symbol . '</span>' . $amount;
-            $amount = '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted_price . '</bdi></span>';
+            $amount = '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted_price . '</bdi></span>';*/
         }
-        return apply_filters('wlac_after_convert_amount',$amount,$modified_amount,$with_symbol,$current_currency);
+        return apply_filters('wlac_after_convert_amount', $amount, $modified_amount, $with_symbol, $current_currency);
     }
 
     function handleRewardShortCodes($reward_list, $is_guest_user)

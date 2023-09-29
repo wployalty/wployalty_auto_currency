@@ -12,6 +12,7 @@ use Wlr\App\Helpers\Woocommerce;
 class WPML implements Currency
 {
     public static $instance = null;
+    public static $currency_list = array();
 
     function getDefaultProductPrice($product_price, $product, $item, $is_redeem, $order_currency)
     {
@@ -99,5 +100,57 @@ class WPML implements Currency
         $current_currency_code = $this->getCurrentCurrencyCode();
         global $woocommerce_wpml;
         return (float)$woocommerce_wpml->multi_currency->prices->convert_price_amount_by_currencies($original_amount, $default_currency, $current_currency_code);
+    }
+
+    function getPriceFormat($amount, $code = '')
+    {
+        if (empty($code)) {
+            return false;
+        }
+        $currency = $this->getCurrencyDetails($code);
+        $num_decimal = is_array($currency) && !empty($currency['num_decimals']) ? $currency['num_decimals'] : wc_get_price_decimals();
+        $decimal_sep = is_array($currency) && !empty($currency['decimal_sep']) ? $currency['decimal_sep'] : wc_get_price_decimal_separator();
+        $thousand_sep = is_array($currency) && !empty($currency['thousand_sep']) ? $currency['thousand_sep'] : wc_get_price_thousand_separator();
+        $woocommerce_helper = Woocommerce::getInstance();
+        $currency_symbol = $woocommerce_helper->getCurrencySymbols($code);
+        $amount = number_format($amount, $num_decimal, $decimal_sep, $thousand_sep);
+        $price_format = $this->getFormat($code);
+        $formatted_price = sprintf($price_format, '<span class="woocommerce-Price-currencySymbol">' . $currency_symbol . '</span>', $amount);
+        return '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted_price . '</bdi></span>';
+    }
+
+    protected function getFormat($code = '')
+    {
+        $format = get_woocommerce_price_format();
+        if (empty($code)) {
+            return $format;
+        }
+        $currency = $this->getCurrencyDetails($code);
+        if (is_array($currency) && !empty($currency['position'])) {
+            switch ($currency['position']) {
+                case 'left':
+                    $format = '%1$s%2$s';
+                    break;
+                case 'right':
+                    $format = '%2$s%1$s';
+                    break;
+                case 'left_space':
+                    $format = '%1$s&nbsp;%2$s';
+                    break;
+                case 'right_space':
+                    $format = '%2$s&nbsp;%1$s';
+                    break;
+            }
+        }
+        return $format;
+    }
+
+    function getCurrencyDetails($code = '')
+    {
+        if (empty($code)) return array();
+        if (isset(self::$currency_list[$code]) && !empty(self::$currency_list[$code])) return self::$currency_list[$code];
+        global $woocommerce_wpml;
+        $multi_currency = $woocommerce_wpml->get_multi_currency();
+        return self::$currency_list[$code] = $multi_currency->get_currency_details_by_code($code);
     }
 }
