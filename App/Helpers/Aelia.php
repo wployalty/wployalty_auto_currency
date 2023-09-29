@@ -9,6 +9,8 @@ namespace Wlac\App\Helpers;
 
 use Wlr\App\Helpers\Woocommerce;
 
+defined('ABSPATH') or die;
+
 class Aelia implements Currency
 {
     public static $instance = null;

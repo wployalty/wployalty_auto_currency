@@ -1,6 +1,6 @@
 <?php
 /**
- * @author      Wployalty (Alagesan)
+ * @author      Wployalty (Mohan)
  * @license     http://www.gnu.org/licenses/gpl-2.0.html
  * @link        https://www.wployalty.net
  * */
@@ -11,7 +11,7 @@ use Wlr\App\Helpers\Woocommerce;
 
 defined('ABSPATH') or die;
 
-class VilaTheme implements Currency
+class PremiumVilaTheme implements Currency
 {
     public static $instance = null;
 
@@ -37,8 +37,8 @@ class VilaTheme implements Currency
 
     function getCurrentCurrencyCode($code = '')
     {
-        if (class_exists('\WOOMULTI_CURRENCY_F_Data')) {
-            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+        if (class_exists('\WOOMULTI_CURRENCY_Data')) {
+            $setting = \WOOMULTI_CURRENCY_Data::get_ins();
             return $setting->get_current_currency();
         }
         return $code;
@@ -46,8 +46,8 @@ class VilaTheme implements Currency
 
     function getDefaultCurrency($code = '')
     {
-        if (class_exists('\WOOMULTI_CURRENCY_F_Data')) {
-            $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+        if (class_exists('\WOOMULTI_CURRENCY_Data')) {
+            $setting = \WOOMULTI_CURRENCY_Data::get_ins();
             return $setting->get_default_currency();
         }
         return $code;
@@ -59,7 +59,7 @@ class VilaTheme implements Currency
         if (!empty($default_currency) && $default_currency == $current_currency_code) {
             return $amount;
         }
-        if (class_exists('\WOOMULTI_CURRENCY_F_Data')) {
+        if (class_exists('\WOOMULTI_CURRENCY_Data')) {
             return (float)wmc_revert_price($amount, $current_currency_code);
         }
         return $amount;
@@ -104,7 +104,7 @@ class VilaTheme implements Currency
     function convertToCurrentCurrency($original_amount, $default_currency)
     {
         $current_currency_code = $this->getCurrentCurrencyCode();
-        if (class_exists('\WOOMULTI_CURRENCY_F_Data')) {
+        if (class_exists('\WOOMULTI_CURRENCY_Data')) {
             return (float)wmc_get_price($original_amount, $current_currency_code);
         }
         return $original_amount;
@@ -115,10 +115,10 @@ class VilaTheme implements Currency
         if (empty($code)) {
             return false;
         }
-        if (!class_exists('\WOOMULTI_CURRENCY_F_Data')) {
+        if (!class_exists('\WOOMULTI_CURRENCY_Data')) {
             return $amount;
         }
-        $setting = \WOOMULTI_CURRENCY_F_Data::get_ins();
+        $setting = \WOOMULTI_CURRENCY_Data::get_ins();
         $selected_currencies = $setting->get_list_currencies();
         $currency = isset($selected_currencies[$code]) && is_array($selected_currencies[$code]) ? $selected_currencies[$code] : array();
         if (empty($currency)) {
