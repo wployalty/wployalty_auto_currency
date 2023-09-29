@@ -192,7 +192,6 @@ class Main extends Base
 
     function isEnabledPremiumVilaThemeCurrency()
     {
-        //Ref: https://wordpress.org/plugins/woocommerce-multi-currency/
         return $this->isPluginIsActive('woocommerce-multi-currency/woocommerce-multi-currency.php');
     }
 

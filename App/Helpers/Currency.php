@@ -1,6 +1,9 @@
 <?php
 
 namespace Wlac\App\Helpers;
+
+defined('ABSPATH') or die;
+
 interface Currency
 {
     function getDefaultProductPrice($product_price, $product, $item, $is_redeem, $order_currency);
