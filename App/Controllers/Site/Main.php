@@ -133,18 +133,20 @@ class Main extends Base
 
     function getActiveCurrencyPlugin()
     {
-        if ($this->isEnableRealMagCurrency()) {
-            return 'RealMag';
+        $currencyPlugins = array(
+            'RealMag' => 'isEnableRealMagCurrency',
+            'VilaTheme' => 'isEnabledVilaThemeCurrency',
+            'WPML' => 'isEnabledWPMLCurrency',
+            'Aelia' => 'isEnabledAeliaoCurrency',
+            'VillaThemePremium' => 'isEnabledVilaThemeCurrencyPremium',
+        );
+
+        foreach ($currencyPlugins as $pluginName => $enableMethod) {
+            if ($this->$enableMethod()) {
+                return $pluginName;
+            }
         }
-        if ($this->isEnabledVilaThemeCurrency()) {
-            return "VilaTheme";
-        }
-        if ($this->isEnabledWPMLCurrency()) {
-            return 'WPML';
-        }
-        if ($this->isEnabledAeliaoCurrency()) {
-            return "Aelia";
-        }
+
         return apply_filters('wlr_enabled_currency_plugin', '');
     }
 
@@ -185,6 +187,10 @@ class Main extends Base
     {
         //Ref: https://wordpress.org/plugins/woo-multi-currency/
         return $this->isPluginIsActive('woo-multi-currency/woo-multi-currency.php');
+    }
+    function isEnabledVilaThemeCurrencyPremium()
+    {
+        return $this->isPluginIsActive('woocommerce-multi-currency/woocommerce-multi-currency.php');
     }
 
     function isEnabledWPMLCurrency()
