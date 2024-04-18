@@ -35,6 +35,9 @@ More information could be found in the documentation
     - PHP version 7.0.0 or greater
 
 == Changelog ==
+= 1.0.2 =
+- Fix - Admin notices remove in auto currency page
+
 = 1.0.1 =
 - Added: HPOS support
 - Added: After convert amount filter

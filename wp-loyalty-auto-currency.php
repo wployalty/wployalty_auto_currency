@@ -3,7 +3,7 @@
  * Plugin Name: WPLoyalty - Multi Currency
  * Plugin URI: https://www.wployalty.net
  * Description: Adds multi-currency support for WPLoyalty with automatic currency conversion compatibility with 4 popular multicurrency plugins for WooCommerce
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: WPLoyalty
  * Slug: wp-loyalty-auto-currency
  * Text Domain: wp-loyalty-auto-currency
@@ -49,7 +49,7 @@ add_action('before_woocommerce_init', function () {
 });
 //Define the plugin version
 defined('WLAC_PLUGIN_NAME') or define('WLAC_PLUGIN_NAME', 'WPLoyalty - Multi Currency');
-defined('WLAC_PLUGIN_VERSION') or define('WLAC_PLUGIN_VERSION', '1.0.1');
+defined('WLAC_PLUGIN_VERSION') or define('WLAC_PLUGIN_VERSION', '1.0.2');
 defined('WLAC_PLUGIN_SLUG') or define('WLAC_PLUGIN_SLUG', 'wp-loyalty-auto-currency');
 defined('WLAC_PLUGIN_PATH') or define('WLAC_PLUGIN_PATH', __DIR__ . '/');
 defined('WLAC_PLUGIN_URL') or define('WLAC_PLUGIN_URL', plugin_dir_url(__FILE__));
