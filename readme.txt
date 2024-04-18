@@ -37,6 +37,7 @@ More information could be found in the documentation
 == Changelog ==
 = 1.0.2 =
 - Fix - Admin notices remove in auto currency page
+- Added: Compatibility for [CURCY – Multi Currency for WooCommerce Premium]
 
 = 1.0.1 =
 - Added: HPOS support
