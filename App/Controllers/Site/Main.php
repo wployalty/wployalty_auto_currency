@@ -31,7 +31,7 @@ class Main extends Base
         if (!Woocommerce::hasAdminPrivilege()) {
             return;
         }
-        $page = isset($_REQUEST['page']) && $_REQUEST['page'];
+        $page = (new \Wlr\App\Helpers\Input())->post_get('page',NULL);
         if ($page != WLAC_PLUGIN_SLUG) {
             return;
         }
