@@ -3,9 +3,9 @@ Contributors: wployalty
 Donate link: https://wployalty.net
 Tags: points, rewards, loyalty, woocommerce points and rewards, points and rewards, woocommerce loyalty, woocommerce rewards, woocommerce reward program, woocommerce loyalty program, reward system
 Requires at least: 4.9.0
-Tested up to: 6.5.2
+Tested up to: 6.5
 WC requires at least: 6.5.0
-WC tested up to: 8.8.2
+WC tested up to: 8.8
 Stable tag: 1.0.2
 Requires PHP: 7.0
 License: GPLv2 or later
