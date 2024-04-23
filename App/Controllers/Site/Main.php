@@ -134,11 +134,10 @@ class Main extends Base
     function getActiveCurrencyPlugin()
     {
         $currencyPlugins = array(
+            'Villa' => 'isVillaCurrencySwitcherEnabled',
             'RealMag' => 'isEnableRealMagCurrency',
-            'VilaTheme' => 'isEnabledVilaThemeCurrency',
             'WPML' => 'isEnabledWPMLCurrency',
             'Aelia' => 'isEnabledAeliaoCurrency',
-            'VillaThemePremium' => 'isEnabledVilaThemeCurrencyPremium',
         );
 
         foreach ($currencyPlugins as $pluginName => $enableMethod) {
@@ -150,6 +149,9 @@ class Main extends Base
         return apply_filters('wlr_enabled_currency_plugin', '');
     }
 
+    function isVillaCurrencySwitcherEnabled(){
+        return $this->isPluginIsActive('woo-multi-currency/woo-multi-currency.php') || $this->isPluginIsActive('woocommerce-multi-currency/woocommerce-multi-currency.php');
+    }
     /**
      * @return bool
      */
@@ -181,16 +183,6 @@ class Main extends Base
             self::$active_plugin_list = $active_plugins;
         }
         return self::$active_plugin_list;
-    }
-
-    function isEnabledVilaThemeCurrency()
-    {
-        //Ref: https://wordpress.org/plugins/woo-multi-currency/
-        return $this->isPluginIsActive('woo-multi-currency/woo-multi-currency.php');
-    }
-    function isEnabledVilaThemeCurrencyPremium()
-    {
-        return $this->isPluginIsActive('woocommerce-multi-currency/woocommerce-multi-currency.php');
     }
 
     function isEnabledWPMLCurrency()

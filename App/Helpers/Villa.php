@@ -1,25 +1,63 @@
 <?php
-
+/**
+ * @author      Wployalty
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html
+ * @link        https://www.wployalty.net
+ * */
 namespace Wlac\App\Helpers;
-use Wlr\App\Helpers\Woocommerce;
-defined("ABSPATH") or die();
-class VillaThemePremium implements Currency
-{
-    public static $instance =null;
 
-    public static function getInstance(array $config = array()){
+use Wlr\App\Helpers\Woocommerce;
+
+defined("ABSPATH") or die();
+
+class Villa implements Currency
+{
+    /**
+     * Instance key for object.
+     *
+     * @var null
+     */
+    public static $instance = null;
+
+    /**
+     * Get Instance Object.
+     *
+     * @param array $config
+     * @return self|null
+     */
+    public static function getInstance($config = array())
+    {
         return (!self::$instance) ? new self($config) : self::$instance;
     }
 
+    /**
+     * Get default product price.
+     *
+     * @param $product_price
+     * @param $product
+     * @param $item
+     * @param $is_redeem
+     * @param $order_currency
+     * @return mixed
+     */
     function getDefaultProductPrice($product_price, $product, $item, $is_redeem, $order_currency)
     {
         return $product_price;
     }
 
+    /**
+     * Get product price.
+     *
+     * @param $product_price
+     * @param $item
+     * @param $is_redeem
+     * @param $order_currency
+     * @return float
+     */
     function getProductPrice($product_price, $item, $is_redeem, $order_currency)
     {
         if (empty($order_currency)) {
-        $order_currency = $this->getCurrentCurrencyCode($order_currency);
+            $order_currency = $this->getCurrentCurrencyCode($order_currency);
         }
         $default_currency = $this->getDefaultCurrency();
         if ($order_currency == $default_currency) {
@@ -31,43 +69,80 @@ class VillaThemePremium implements Currency
         return $product_price;
     }
 
-    function getCurrentCurrencyCode($code=''){
-        if(class_exists('\WOOMULTI_CURRENCY_Data')){
-            $setting = \WOOMULTI_CURRENCY_Data::get_ins();
-            return $setting->get_current_currency();
+    /**
+     * Get current currency code.
+     *
+     * @param string $code Currency code.
+     * @return bool|mixed|string
+     */
+    function getCurrentCurrencyCode($code = '')
+    {
+        $setting = self::getCurrencySettingObject();
+        if ($setting === null) {
+            return $code;
         }
-        return $code;
+        return $setting->get_current_currency();
     }
 
+    /**
+     * Get default currency code.
+     *
+     * @param string $code Currency code.
+     * @return mixed|string
+     */
     function getDefaultCurrency($code = '')
     {
-        if (class_exists('\WOOMULTI_CURRENCY_Data')) {
-            $setting = \WOOMULTI_CURRENCY_Data::get_ins();
-            return $setting->get_default_currency();
+        $setting = self::getCurrencySettingObject();
+        if ($setting === null) {
+            return $code;
         }
-        return $code;
+        return $setting->get_default_currency();
     }
 
+    /**
+     * Convert amount into default currency.
+     *
+     * @param int|float $amount Currency amount.
+     * @param string $current_currency_code Currency code.
+     * @return float
+     */
     function convertToDefaultCurrency($amount, $current_currency_code)
     {
         $default_currency = $this->getDefaultCurrency();
         if (!empty($default_currency) && $default_currency == $current_currency_code) {
             return $amount;
         }
-        if (class_exists('\WOOMULTI_CURRENCY_Data')) {
-            return (float)wmc_revert_price($amount, $current_currency_code);
+        $setting = self::getCurrencySettingObject();
+        if ($setting === null) {
+            return $amount;
         }
-        return $amount;
-    }
-    function convertToCurrentCurrency($original_amount, $default_currency)
-    {
-        $current_currency_code = $this->getCurrentCurrencyCode();
-        if (class_exists('\WOOMULTI_CURRENCY_Data')) {
-            return (float)wmc_get_price($original_amount, $current_currency_code);
-        }
-        return $original_amount;
+        return (float)wmc_revert_price($amount, $current_currency_code);
     }
 
+    /**
+     * Convert to current currency amount.
+     *
+     * @param int|float $original_amount Original amount.
+     * @param string $default_currency Currency value.
+     * @return float
+     */
+    function convertToCurrentCurrency($original_amount, $default_currency)
+    {
+        $setting = self::getCurrencySettingObject();
+        if ($setting === null) {
+            return $original_amount;
+        }
+        $current_currency_code = $this->getCurrentCurrencyCode();
+        return (float)wmc_get_price($original_amount, $current_currency_code);
+    }
+
+    /**
+     * Convert order total.
+     *
+     * @param $total
+     * @param $order
+     * @return float|int
+     */
     function convertOrderTotal($total, $order)
     {
         $woocommerce_helper = Woocommerce::getInstance();
@@ -79,12 +154,26 @@ class VillaThemePremium implements Currency
         return $total;
     }
 
+    /**
+     * Get cart subtotal.
+     *
+     * @param $sub_total
+     * @param $cart_data
+     * @return float|int
+     */
     function getCartSubtotal($sub_total, $cart_data)
     {
         $current_currency = $this->getCurrentCurrencyCode();
         return $this->convertToDefaultCurrency($sub_total, $current_currency);
     }
 
+    /**
+     * Get order subtotal value.
+     *
+     * @param $sub_total
+     * @param $order_data
+     * @return float
+     */
     function getOrderSubtotal($sub_total, $order_data)
     {
         $woocommerce_helper = Woocommerce::getInstance();
@@ -95,26 +184,38 @@ class VillaThemePremium implements Currency
         }
         return $sub_total;
     }
-    function getCurrencySymbol($current_currency, $code)
+
+    /**
+     * Get the currency setting object.
+     *
+     * @return object|null The currency setting object or null if not found.
+     */
+    static function getCurrencySettingObject()
     {
-        $woocommerce_helper = Woocommerce::getInstance();
-        if (!is_array($current_currency)) {
-            return $woocommerce_helper->getCurrencySymbols($code);
+        if (class_exists('\WOOMULTI_CURRENCY_F_Data')) {
+            return new \WOOMULTI_CURRENCY_F_Data();
+        } elseif (class_exists('\WOOMULTI_CURRENCY_Data')) {
+            return new \WOOMULTI_CURRENCY_Data();
         }
-        if (isset($current_currency['custom']) && !empty($current_currency['custom'])) {
-            return $current_currency['custom'];
-        }
-        return $woocommerce_helper->getCurrencySymbols($code);
+        return null;
     }
+
+    /**
+     * Get price format.
+     *
+     * @param int|float $amount Price amount.
+     * @param string $code Currency code.
+     * @return false|string
+     */
     function getPriceFormat($amount, $code = '')
     {
         if (empty($code)) {
             return false;
         }
-        if (!class_exists('\WOOMULTI_CURRENCY_Data')) {
+        $setting = self::getCurrencySettingObject();
+        if ($setting === null) {
             return $amount;
         }
-        $setting = \WOOMULTI_CURRENCY_Data::get_ins();
         $selected_currencies = $setting->get_list_currencies();
         $currency = isset($selected_currencies[$code]) && is_array($selected_currencies[$code]) ? $selected_currencies[$code] : array();
         if (empty($currency)) {
@@ -131,6 +232,32 @@ class VillaThemePremium implements Currency
         return '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted_price . '</bdi></span>';
     }
 
+    /**
+     * Get currency symbol.
+     *
+     * @param array $current_currency Currency data
+     * @param string $code Currency code.
+     * @return mixed
+     */
+    protected function getCurrencySymbol($current_currency, $code)
+    {
+        $woocommerce_helper = new Woocommerce();
+        if (!is_array($current_currency)) {
+            return $woocommerce_helper->getCurrencySymbols($code);
+        }
+        if (isset($current_currency['custom']) && !empty($current_currency['custom'])) {
+            return $current_currency['custom'];
+        }
+        return $woocommerce_helper->getCurrencySymbols($code);
+    }
+
+    /**
+     * Get price format for currency.
+     *
+     * @param array $currency Currency data.
+     * @param string $code Currency code.
+     * @return string
+     */
     protected function getFormat($currency, $code = '')
     {
         $format = get_woocommerce_price_format();
