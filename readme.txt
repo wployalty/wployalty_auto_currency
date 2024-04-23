@@ -35,6 +35,10 @@ More information could be found in the documentation
     - PHP version 7.0.0 or greater
 
 == Changelog ==
+= 1.0.3 =
+- Fix - Point earning based on store currency [CURCY - Multi Currency for Woocommerce Premium]
+
+== Changelog ==
 = 1.0.2 =
 - Fix - Admin notices remove in auto currency page
 - Added: Compatibility for [CURCY – Multi Currency for WooCommerce Premium]
