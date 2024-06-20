@@ -116,7 +116,10 @@ class Villa implements Currency
         if ($setting === null) {
             return $amount;
         }
-        return (float)wmc_revert_price($amount, $current_currency_code);
+	    $setting = self::getCurrencySettingObject();
+	    $selected_currencies = $setting->get_list_currencies();
+	    $rate = isset( $selected_currencies[ $current_currency_code ] ) && !empty($selected_currencies[ $current_currency_code ]['rate'])  ? $selected_currencies[ $current_currency_code ]['rate']:1;
+	    return $rate > 0 ? (float)$amount/$rate: (float)wmc_revert_price($amount, $current_currency_code);
     }
 
     /**
