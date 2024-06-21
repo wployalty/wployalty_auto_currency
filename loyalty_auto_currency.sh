@@ -11,6 +11,7 @@ composer_run() {
   cd ..
   echo "Compress Done"
 }
+
 copy_folder() {
   cd $current_dir
   from_folder="wployalty_auto_currency"
