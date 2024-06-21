@@ -5,9 +5,9 @@
  * @link        https://www.wployalty.net
  * */
 
-namespace Wlac\App\Helpers;
+namespace Wlac\App\Compatibility;
 
-use Wlr\App\Helpers\Woocommerce;
+use Wlac\App\Helpers\Woocommerce;
 
 class WPML implements Currency
 {

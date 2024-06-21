@@ -4,9 +4,9 @@
  * @license     http://www.gnu.org/licenses/gpl-2.0.html
  * @link        https://www.wployalty.net
  * */
-namespace Wlac\App\Helpers;
+namespace Wlac\App\Compatibility;
 
-use Wlr\App\Helpers\Woocommerce;
+use Wlac\App\Helpers\Woocommerce;
 
 defined("ABSPATH") or die();
 

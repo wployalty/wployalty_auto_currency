@@ -1,6 +1,6 @@
 <?php
 
-namespace Wlac\App\Helpers;
+namespace Wlac\App\Compatibility;
 interface Currency
 {
     function getDefaultProductPrice($product_price, $product, $item, $is_redeem, $order_currency);
